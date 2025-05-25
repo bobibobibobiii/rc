@@ -1,0 +1,41 @@
+# Build and Release Folders
+bin-debug/
+bin-release/
+[Oo]bj/
+[Bb]in/
+
+# Other files and folders
+.settings/
+ESPWIFI/
+test/
+
+# Keil Generated output files in the sub-directories .\Listings and .\Objects
+*.lst
+*.o
+*.d
+*.crf
+*.lnp
+*.axf
+*.htm
+*.build_log.htm
+*.dep
+*.iex
+*.i
+*.bin
+*.hex
+SI/
+MDK-ARM/DebugConfig
+MDK-ARM/RTE
+MDK-ARM/OmniChassis
+*.scvd
+#Keil Project screen layout file
+#!/MDK-ARM/*.uvoptx
+#!/MDK-ARM/*.uvprojx
+
+#JLINK file
+JLinkLog.txt
+
+
+# Project files, i.e. `.project`, `.actionScriptProperties` and `.flexProperties`
+# should NOT be excluded as they contain compiler settings and other important
+# information for Eclipse / Flash Builder.
