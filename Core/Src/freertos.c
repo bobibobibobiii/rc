@@ -52,6 +52,9 @@ osThreadId PlatformTaskHandle;
 osThreadId CommunicateTaskHandle;
 osThreadId RemoteTaskHandle;
 osThreadId ChassisTaskHandle;
+osThreadId ServeTaskHandle;
+osThreadId GimbalTaskHandle;
+osThreadId RiseTaskHandle;
 
 /* Private function prototypes -----------------------------------------------*/
 /* USER CODE BEGIN FunctionPrototypes */
@@ -63,6 +66,9 @@ void Platform_Task(void const * argument);
 void Communicate_Task(void const * argument);
 void Remote_Task(void const * argument);
 void Chassis_Task(void const * argument);
+void Serve_Task(void const * argument);
+void Gimbal_Task(void const * argument);
+void Rise_Task(void const * argument);
 
 void MX_FREERTOS_Init(void); /* (MISRA C 2004 rule 8.1) */
 
@@ -126,8 +132,20 @@ void MX_FREERTOS_Init(void) {
   RemoteTaskHandle = osThreadCreate(osThread(RemoteTask), NULL);
 
   /* definition and creation of ChassisTask */
-  osThreadDef(ChassisTask, Chassis_Task, osPriorityRealtime, 0, 256);
-  ChassisTaskHandle = osThreadCreate(osThread(ChassisTask), NULL);
+  // osThreadDef(ChassisTask, Chassis_Task, osPriorityRealtime, 0, 256);
+  // ChassisTaskHandle = osThreadCreate(osThread(ChassisTask), NULL);
+
+  /* definition and creation of ServeTask */
+  // osThreadDef(ServeTask, Serve_Task, osPriorityRealtime, 0, 256);
+  // ServeTaskHandle = osThreadCreate(osThread(ServeTask), NULL);
+
+  /* definition and creation of GimbalTask */
+  // osThreadDef(GimbalTask, Gimbal_Task, osPriorityRealtime, 0, 256);
+  // GimbalTaskHandle = osThreadCreate(osThread(GimbalTask), NULL);
+
+  /* definition and creation of RiseTask */
+  osThreadDef(RiseTask, Rise_Task, osPriorityIdle, 0, 256);
+  RiseTaskHandle = osThreadCreate(osThread(RiseTask), NULL);
 
   /* USER CODE BEGIN RTOS_THREADS */
   /* add threads, ... */
@@ -223,6 +241,60 @@ __weak void Chassis_Task(void const * argument)
     osDelay(1);
   }
   /* USER CODE END Chassis_Task */
+}
+
+/* USER CODE BEGIN Header_Serve_Task */
+/**
+* @brief Function implementing the ServeTask thread.
+* @param argument: Not used
+* @retval None
+*/
+/* USER CODE END Header_Serve_Task */
+__weak void Serve_Task(void const * argument)
+{
+  /* USER CODE BEGIN Serve_Task */
+  /* Infinite loop */
+  for(;;)
+  {
+    osDelay(1);
+  }
+  /* USER CODE END Serve_Task */
+}
+
+/* USER CODE BEGIN Header_Gimbal_Task */
+/**
+* @brief Function implementing the GimbalTask thread.
+* @param argument: Not used
+* @retval None
+*/
+/* USER CODE END Header_Gimbal_Task */
+__weak void Gimbal_Task(void const * argument)
+{
+  /* USER CODE BEGIN Gimbal_Task */
+  /* Infinite loop */
+  for(;;)
+  {
+    osDelay(1);
+  }
+  /* USER CODE END Gimbal_Task */
+}
+
+/* USER CODE BEGIN Header_Rise_Task */
+/**
+* @brief Function implementing the RiseTask thread.
+* @param argument: Not used
+* @retval None
+*/
+/* USER CODE END Header_Rise_Task */
+__weak void Rise_Task(void const * argument)
+{
+  /* USER CODE BEGIN Rise_Task */
+  /* Infinite loop */
+  for(;;)
+  {
+    osDelay(1);
+  }
+  /* USER CODE END Rise_Task */
 }
 
 /* Private application code --------------------------------------------------*/

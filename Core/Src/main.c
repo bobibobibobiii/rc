@@ -27,6 +27,10 @@
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 #include "app_init.h"
+#include "periph_motor.h"
+#include "util_vofa.h"
+#include "module_rise.h"
+#include "util_PIDtune.h"
 
 /* USER CODE END Includes */
 
@@ -49,6 +53,7 @@
 
 /* USER CODE BEGIN PV */
 
+
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -68,11 +73,11 @@ extern uint8_t boardcom_Buffer[32];
   * @retval int
   */
 int main(void)
-
 {
 
   /* USER CODE BEGIN 1 */
 
+	
   /* USER CODE END 1 */
 
   /* MCU Configuration--------------------------------------------------------*/
@@ -103,6 +108,12 @@ int main(void)
   MX_UART8_Init();
   /* USER CODE BEGIN 2 */
 	Init_InitAll();
+  // 2. !!! 在这里调用 VOFA 帧初始化 !!!
+  Vofa_Frame_Init();
+	
+  // Motor_DM_Basic_Output(&Motor_Rise_Chop_Left_Motors , Motor_Enable);
+	// HAL_Delay(1000);
+  
   /* USER CODE END 2 */
 
   /* Call init function for freertos objects (in cmsis_os2.c) */
@@ -115,14 +126,18 @@ int main(void)
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
-  while (1)
-  {
+  while (1){
+ 
+    // Motor_SetMotorOutput(&Motor_Rise_Lift_Motor, 0.5f);  
+    // Motor_SendMotorGroupOutput(&Motor_Rise_Lift_Motors);   // 发送指令
+    // HAL_Delay(20);  // 周期 20ms
+	}
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
   }
   /* USER CODE END 3 */
-}
+
 
 /**
   * @brief System Clock Configuration
@@ -170,6 +185,7 @@ void SystemClock_Config(void)
 }
 
 /* USER CODE BEGIN 4 */
+
 
 /* USER CODE END 4 */
 

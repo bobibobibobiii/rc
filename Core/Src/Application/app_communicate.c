@@ -29,7 +29,7 @@
 	    Comm_DataTypeDef *buscomm = Comm_GetBusDataPtr();
     for(;;) {
 			
-			buscomm->tx_dt = DWT_GetDeltaT(&buscomm->last_tx_tick);
+	  buscomm->tx_dt = DWT_GetDeltaT(&buscomm->last_tx_tick);
       Comm_SendCommData();
       osDelay(3);
     }

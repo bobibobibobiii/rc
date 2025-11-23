@@ -15,7 +15,7 @@ void Module_ServeInit(void) {
   serve->target_angle = 0.0f;
   serve->current_PoleTorque = 0;
   serve->target_speed = 0.0f;
-  serve->ServeMotors = Motor_groupHandle[3];
+  serve->ServeMotors = Motor_groupHandle[5];
 
   PID_InitPIDParam(&serve->PID_LeftAngleParam, Const_LeftPosMotorParam[0][0],
                    Const_LeftPosMotorParam[0][1], Const_LeftPosMotorParam[0][2],
@@ -53,7 +53,7 @@ Module_ServeTypeDef *Module_ServeGetPtr(void) { return &ServeData; }
 
 void Module_ServeReady(void) {
   Module_ServeTypeDef *serve = Module_ServeGetPtr();
-  serve->target_speed = 2.0f;
+  serve->target_speed = -2.0f;
 	
   if (!Module_ServeIsAngle()) {
     Module_ServeSpdPIDCal();
@@ -64,7 +64,9 @@ void Module_ServeReady(void) {
                          PID_GetPIDOutput(&serve->PID_RightSpeed) -
                              serve->current_PoleTorque / 2);
   } else {
-	serve->target_angle = 150.0f;
+	serve->target_angle = -120.0f;
+	 
+	Module_ServeClearStateError();
     Module_ServeAnglePIDCal();
     Motor_SetMotorOutput(serve->ServeMotors->motor_handle[0],
                          PID_GetPIDOutput(&serve->PID_LeftSpeed) + 
@@ -79,7 +81,7 @@ void Module_ServeReady(void) {
 
 void Module_ServeHit(void) {
 	Module_ServeTypeDef *serve = Module_ServeGetPtr();
-	serve->target_speed = - 27.5f;
+	serve->target_speed = 28.5f;//27.5
 
 	if (!Module_ServeIsAngle()) {
 		Module_ServeSpdPIDCal();
@@ -104,7 +106,7 @@ void Module_ServeHit(void) {
 void Module_ServeKeep(void) {
 	Module_ServeTypeDef *serve = Module_ServeGetPtr();
 	serve->target_speed = 0.0f;
-	
+
 	Module_ServeSpdPIDCal();
 	Motor_SetMotorOutput(serve->ServeMotors->motor_handle[0],
 					 PID_GetPIDOutput(&serve->PID_LeftSpeed) + serve->current_PoleTorque / 2);
@@ -182,7 +184,7 @@ uint8_t Module_ServeIsAngle(void) {
 
   if (serve->target_speed < 0) 
   {
-    if (serve->current_angle < -180.0f) {
+    if (serve->current_angle < -100.0f) {
       serve->is_angle = 1;
       return 1;
     }
@@ -191,7 +193,7 @@ uint8_t Module_ServeIsAngle(void) {
   } 
   else if (serve->target_speed > 0) 
   {
-    if (serve->current_angle > 130.0f) {
+    if (serve->current_angle > 180.0f) {
       serve->is_angle = 1;
       return 1;
     }
@@ -250,4 +252,20 @@ void Module_ServeSpdPIDCal(void) {
         serve->ServeMotors->motor_handle[1]->encoder.standard_speed);
     PID_CalcPID(&serve->PID_RightSpeed, &serve->PID_RightSpeedParam);
 
+}
+
+
+
+void Module_ServeClearStateError(void)
+{
+	Module_ServeTypeDef *serve = Module_ServeGetPtr();
+
+	if (serve->current_angle < -115.0f && serve->current_angle > -125.0f && serve->current_speed == 0)
+	{
+		//serve->ServeMotors->motor_handle[0]->encoder.init_offset =  120.0f + serve->ServeMotors->motor_handle[0]->encoder.consequent_angle;
+		serve->ServeMotors->motor_handle[1]->encoder.init_offset += (serve->ServeMotors->motor_handle[0]->encoder.consequent_angle + serve->ServeMotors->motor_handle[1]->encoder.consequent_angle);
+	}
+	
+	
+	
 }

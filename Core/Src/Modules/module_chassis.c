@@ -104,6 +104,12 @@ void Chassis_SetControlMode(uint8_t mode) {
 	Chassis_DataTypeDef *Chassis = Chassis_GetChassisPtr();
 	Chassis->Chassis_CtrlMode = mode;
 }
+
+void Chassis_SetState(Chassis_StateEnum state) {
+	Chassis_DataTypeDef *Chassis = Chassis_GetChassisPtr();
+	Chassis->Chassis_State = state;
+}
+
 void Chassis_Stepback(float distance,float w_angle)
 {
 	Chassis_DataTypeDef *Chassis = Chassis_GetChassisPtr();	
@@ -133,7 +139,7 @@ void Chassis_Stepback(float distance,float w_angle)
 
 void Chassis_Control(){
 Chassis_DataTypeDef *Chassis = Chassis_GetChassisPtr();
-	
+Chassis->update_dt = DWT_GetDeltaT(&Chassis->last_update_tick);
 switch(Chassis->Chassis_CtrlMode){
 	case Chassis_Remote: 
 		break;
@@ -246,8 +252,8 @@ void Chassis_SteeringWheel_ControlMove()
 		//Motor_SetMotorOutput(Chassis->MoveMotors->motor_handle[i], 0);
 	}
 	
-	Motor_SendMotorGroupOutput(Chassis->DirectionMotors);
-	Motor_SendMotorGroupOutput(Chassis->MoveMotors);
+	//Motor_SendMotorGroupOutput(Chassis->DirectionMotors);
+	//Motor_SendMotorGroupOutput(Chassis->MoveMotors);
 }
 
 

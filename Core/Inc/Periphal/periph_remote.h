@@ -1,4 +1,14 @@
 /*
+ * @Author: error: error: git config user.name & please set dead value or install git && error: git config user.email & please set dead value or install git & please set dead value or install git
+ * @Date: 2025-05-25 18:03:38
+ * @LastEditors: error: error: git config user.name & please set dead value or install git && error: git config user.email & please set dead value or install git & please set dead value or install git
+ * @LastEditTime: 2025-10-30 21:15:10
+ * @FilePath: \MDK-ARMd:\Files\xiaobing_origin\xiaobing\Core\Inc\Periphal\periph_remote.h
+ * @Description: 
+ * 
+ * Copyright (c) 2025 by ${git_name_email}, All Rights Reserved. 
+ */
+/*
  *  Project      : Polaris Robot
  * 
  *  FilePath     : periph_remote.h
@@ -19,10 +29,10 @@ extern "C" {
 #include "util_uart.h"
 #include "stdlib.h"
 
-#define Const_Remote_RX_BUFF_LEN             		54
-#define Const_Remote_RX_FRAME_LEN                   18
-#define Const_Remote_CHANNEL_VALUE_OFFSET           1024
-#define Const_Remote_CHANNEL_ERROR_LIMIT            700
+#define Const_Remote_RX_BUFF_LEN             		54 //接收缓冲区长度（最多存 54 字节）
+#define Const_Remote_RX_FRAME_LEN                   18 //标准帧长度
+#define Const_Remote_CHANNEL_VALUE_OFFSET           1024 //通道中值（中立值），遥控器静止时 ch ≈ 1024
+#define Const_Remote_CHANNEL_ERROR_LIMIT            700 //容错区间，防止噪声引发误动作
 
 typedef enum {
     Remote_STATE_NULL       = 0,

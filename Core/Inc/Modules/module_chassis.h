@@ -78,6 +78,7 @@ void Chassis_Trans_ControlData();
 void Chassis_Init();
 uint16_t float_to_2bytes(float value);
 void Chassis_SetControlMode(uint8_t mode);
+void Chassis_SetState(Chassis_StateEnum state);
 void Chassis_Set_Speed(uint8_t state,float x,float y,float w,float r);
 #endif
 

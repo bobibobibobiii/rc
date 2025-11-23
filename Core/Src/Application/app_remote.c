@@ -17,6 +17,7 @@
 #include "module_communicate.h"
 #include "app_gimbal.h"
 #include "module_chassis.h"
+#include "module_rise.h"
 
 Remote_RemoteControlTypeDef Remote_remoteControlData;
 
@@ -29,7 +30,7 @@ void Remote_Task(void const * argument) {
  
     for(;;) {
         Remote_ControlCom();
-        osDelay(2);
+        osDelay(1);
     }
 }
 
@@ -71,7 +72,8 @@ void Remote_ControlCom() {
             break;
         }
         case Remote_SWITCH_MIDDLE: {
-      Remote_RemoteProcessPlus();			//dianqiu  
+      //Remote_RemoteProcessPlus();			//dianqiu  
+      Remote_RiseProcess();
             break;
         }
         case Remote_SWITCH_DOWN: {    //chuanqiu
@@ -94,24 +96,34 @@ void Remote_ControlCom() {
 void Remote_RemoteProcess() {
     Remote_RemoteDataTypeDef *data = Remote_GetRemoteDataPtr();
     Platform_DataTypeDef *Platform = Platform_GetPlatformPtr();
-	  Gimbal_DataTypeDef *gimbal = Gimbal_GetDataPtr();
+	Gimbal_TypeDef *gimbal = Gimbal_GetPtr();
 	
     switch (data->remote.s[1]) {
         case Remote_SWITCH_UP: {
-			Platform_Set_ControlMode(Platform_Jiefa);	
-			Chassis_SetControlMode(Chassis_PC);   
+			Platform_Set_ControlMode(Platform_Dianqiu);	
+			Gimbal_StateSet(Gimbal_auto);
+			Chassis_SetControlMode(Chassis_Remote);   
+			Chassis_Set_Speed(Chassis_Run, data->remote.ch[2]/660.0f * 3.0f,data->remote.ch[3]/660.0f * 3.0f,-data->remote.ch[0]/660.0f * 3.0f,50); 
 				break;
         }
         case Remote_SWITCH_MIDDLE: {
-			Platform_Set_ControlMode(Platform_Initpose);
+						Platform_Set_ControlMode(Platform_Dianqiu);	
+			//Gimbal_StateSet(Gimbal_auto);
 			Chassis_SetControlMode(Chassis_Remote);   
-			Chassis_Set_Speed(Chassis_Run, data->remote.ch[2]/660.0f * 3.0f,data->remote.ch[3]/660.0f * 3.0f,data->remote.ch[0]/660.0f * 3.0f,1);  							
-					break;
+			Chassis_Set_Speed(Chassis_Run, data->remote.ch[2]/660.0f * 3.0f,data->remote.ch[3]/660.0f * 3.0f,-data->remote.ch[0]/660.0f * 3.0f,50); 
+	
+//			Platform_Set_ControlMode(Platform_Jiefa);
+//			Chassis_SetControlMode(Chassis_Remote);   
+//			Chassis_Set_Speed(Chassis_Run, data->remote.ch[2]/660.0f * 3.0f,data->remote.ch[3]/660.0f * 3.0f,-(data->remote.ch[0]/660.0f * 3.0f),50);
+//			Gimbal_StateSet(Gimbal_auto);
+				break;
         }
         case Remote_SWITCH_DOWN: {
-			Platform_Set_ControlMode(Platform_Stop);	
-			Chassis_SetControlMode(Chassis_Remote);  					
-			Chassis_Set_Speed(Chassis_Stop,0,0,0,0); 						
+	    Platform_Set_ControlMode(Platform_Dianqiu);	
+			//Gimbal_StateSet(Gimbal_auto);
+			Chassis_SetControlMode(Chassis_Remote);   
+			Chassis_Set_Speed(Chassis_Run, data->remote.ch[2]/660.0f * 3.0f,data->remote.ch[3]/660.0f * 3.0f,-data->remote.ch[0]/660.0f * 3.0f,50); 
+	
 				break;
         }
         default:
@@ -132,8 +144,12 @@ void Remote_RemoteProcessPlus() {
     switch (data->remote.s[1]) {
         case Remote_SWITCH_UP: {
 
-			 Platform_Set_ControlMode(Platform_Dianqiu);									
-			 Chassis_SetControlMode(Chassis_Location); 	
+//			Platform_Set_ControlMode(Platform_Chuanqiu);
+//			Platform_Set_Target_Pos(0,0,data->remote.ch[1]*0.25/660.0f+0.15f,data->remote.ch[2]*30.0f/660.0f,0,data->remote.ch[3]*30.0f/660.0f);
+        	Platform_Set_ControlMode(Platform_Initpose);								
+			 //Chassis_SetControlMode(Chassis_Location); 	
+			Chassis_SetControlMode(Chassis_Remote);   
+			Chassis_Set_Speed(Chassis_Run, data->remote.ch[2]/660.0f * 3.0f,data->remote.ch[3]/660.0f * 3.0f,-(data->remote.ch[0]/660.0f * 3.0f),3); 
 					
 				break;
         }
@@ -142,8 +158,9 @@ void Remote_RemoteProcessPlus() {
 			Platform_Set_ControlMode(Platform_Initpose);	
 						
 			Chassis_SetControlMode(Chassis_Remote);   
-			Chassis_Set_Speed(Chassis_Run, data->remote.ch[2]/660.0f * 3.0f,data->remote.ch[3]/660.0f * 3.0f,data->remote.ch[0]/660.0f * 3.0f,3); 
-						
+			Chassis_Set_Speed(Chassis_Stop, data->remote.ch[2]/660.0f * 3.0f,data->remote.ch[3]/660.0f * 3.0f,-(data->remote.ch[0]/660.0f * 3.0f),100); 
+			//Chassis_Set_Speed(Chassis_Stop,0,0,0,0);
+			Gimbal_StateSet(Gimbal_remote);
 				break;
         }
         case Remote_SWITCH_DOWN: {
@@ -151,6 +168,7 @@ void Remote_RemoteProcessPlus() {
 			Platform_Set_ControlMode(Platform_Stop);
 			Chassis_SetControlMode(Chassis_Remote);
 			Chassis_Set_Speed(Chassis_Stop,0,0,0,0);
+			Gimbal_StateSet(Gimbal_Off);
 			
 				break;
         }
@@ -159,7 +177,46 @@ void Remote_RemoteProcessPlus() {
     }
 }
 
-void Remote_NucProcess() {
+void Remote_RiseProcess(){
+    Remote_RemoteDataTypeDef *data = Remote_GetRemoteDataPtr();
+    Platform_DataTypeDef *Platform = Platform_GetPlatformPtr();
+    Rise_DataTypeDef *Rise = Rise_GetRisePtr();
+    
+    switch (data->remote.s[1]) {
+        case Remote_SWITCH_UP: {
+
+  //			Platform_Set_ControlMode(Platform_Chuanqiu);
+  //			Platform_Set_Target_Pos(0,0,data->remote.ch[1]*0.25/660.0f+0.15f,data->remote.ch[2]*30.0f/660.0f,0,data->remote.ch[3]*30.0f/660.0f);
+          Rise_Set_ControlMode(Rise_Auto);								
+          Chassis_SetControlMode(Chassis_Remote);
+          Chassis_Set_Speed(Chassis_Stop,0,0,0,0);
+					
+				 break;
+        }
+        case Remote_SWITCH_MIDDLE: {
+          Rise_Set_ControlMode(Rise_Cuoqiu);			
+          Platform_Set_ControlMode(Platform_Stop);
+          Chassis_SetControlMode(Chassis_Remote);
+          Chassis_Set_Speed(Chassis_Stop,0,0,0,0);
+          Gimbal_StateSet(Gimbal_Off);
+
+				 break;
+        }
+        case Remote_SWITCH_DOWN: {
+          Rise_Set_ControlMode(Rise_Stop);			
+          Platform_Set_ControlMode(Platform_Stop);
+          Chassis_SetControlMode(Chassis_Remote);
+          Chassis_Set_Speed(Chassis_Stop,0,0,0,0);
+          Gimbal_StateSet(Gimbal_Off);
+			
+				break;
+        }
+        default:
+				 break;
+    }
+}
+
+void Remote_NucProcess() { //chuanqiu
 	
     Remote_RemoteDataTypeDef *data = Remote_GetRemoteDataPtr();
     Platform_DataTypeDef *Platform = Platform_GetPlatformPtr();
@@ -167,25 +224,26 @@ void Remote_NucProcess() {
     switch (data->remote.s[1]) {
         case Remote_SWITCH_UP: {
 			
-	        Platform_Set_ControlMode(Platform_Chuanqiu);
-			Platform_Set_Target_Pos(0,0,data->remote.ch[1]*0.25/660.0f+0.25f,-16.0f+data->remote.ch[2]*30.0f/660.0f,0,data->remote.ch[3]*30.0f/660.0f);
+	    Platform_Set_ControlMode(Platform_Chuanqiu);
+			Platform_Set_Target_Pos(0,0,data->remote.ch[1]*0.25/660.0f+0.25f,-18.0f+data->remote.ch[2]*30.0f/660.0f,0,data->remote.ch[3]*30.0f/660.0f);
 			Chassis_SetControlMode(Chassis_Lock);  												
-									
+			Chassis_Set_Speed(Chassis_Lock,0,0,0,0); 							
             break;
         }
         case Remote_SWITCH_MIDDLE: {
 		    
 			Chassis_SetControlMode(Chassis_Remote);   
-			Chassis_Set_Speed(Chassis_Run, data->remote.ch[2]/660.0f * 3.0f,data->remote.ch[3]/660.0f * 3.0f,data->remote.ch[0]/660.0f * 3.0f,50); 				
+			Chassis_Set_Speed(Chassis_Run, data->remote.ch[2]/660.0f * 3.0f,data->remote.ch[3]/660.0f * 3.0f,-(data->remote.ch[0]/660.0f * 3.0f),50); 				
 			Platform_Set_ControlMode(Platform_Test);	
-			Platform_Set_Target_Pos(0,0,data->remote.ch[1]*0.25/660.0f+0.23f,-15.0f+data->remote.ch[2]*30.0f/660.0f,0,data->remote.ch[3]*30.0f/660.0f);
+			Platform_Set_Target_Pos(0,0,0.23f,-16.0f,0,0);
 					
             break;
         }
         case Remote_SWITCH_DOWN: {
          
 			Platform_Set_ControlMode(Platform_Stop);		
-			Chassis_Set_Speed(Chassis_Stop,0,0,0,0); 
+			Chassis_Set_Speed(Chassis_Stop,0,0,0,0);
+			Gimbal_StateSet(Gimbal_Off);
   				
 			break;
         }

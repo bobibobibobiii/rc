@@ -15,7 +15,7 @@
  #include "alg_math.h"
  #include "cmsis_os.h"
  #include "app_remote.h"
-
+ #include "periph_remote.h"
  
 Platform_DataTypeDef Platform_Data;
   /**
@@ -86,7 +86,7 @@ void Platform_Init() {
  void Platform_Update_Fdb() {
    Platform_DataTypeDef *Platform = Platform_GetPlatformPtr();
 
- Platform->fdb.front_pitch_angle = 1.5f-Motor_Pitch_Front_Motor.encoder.angle;
+ Platform->fdb.front_pitch_angle = 3.5f-Motor_Pitch_Front_Motor.encoder.angle;
  Platform->fdb.left_pitch_angle  = -5.6f-Motor_Pitch_Left_Motor.encoder.angle;
  Platform->fdb.right_pitch_angle = Motor_Pitch_Right_Motor.encoder.angle-54.0f;
 	 
@@ -293,10 +293,12 @@ void  Platform_Jiefa_Cal(float hit)
 
 		 }else {
 			Platform_Set_OutputState(Platform_slow);	
-			 Platform_Set_Target_Pos(0,0,0.13f,0,0,0);
+			 Platform_Set_Target_Pos(0,0,0.15f,0,0,0);
 		   start_back_time = DWT_GetTimeline_s();	
 		  finishhit = 1;	
 		 }
+  //解释：从 start_hit_time 开始 1 秒内，平台沿 Z 轴上升 (l_tar += 0.15)，做“击发动作”。
+  //超过 1 秒后，平台返回原始高度 0.15 m，同时切换慢速状态，并记录返回时间，标记动作完成（finishhit = 1）。
   }	
 	else if(finishhit == 1){
 		if(DWT_GetTimeline_s() - start_back_time <= 1.5f){
@@ -304,33 +306,49 @@ void  Platform_Jiefa_Cal(float hit)
 		}
 		else {
 		   if((int)hit == 1) {
-			   Platform_Set_Target_Pos(0,0,0.13f,0,0,0);
+			   Platform_Set_Target_Pos(0,0,0.15f,0,0,0);
 		     Platform_Set_OutputState(Platform_middle);
 
          start_hit_time = DWT_GetTimeline_s();
          finishhit = 0;
 			 }else if((int)hit != 1) {
-				 Platform_Set_Target_Pos(0,0,0.13f,0,0,0);
+				 Platform_Set_Target_Pos(0,0,0.15f,0,0,0);
 			   Platform_Set_OutputState(Platform_middle);
 
 			 }
 		 }
 	}	
 };
-void  Platform_Dianqiu_Cal(float hit)
+void  Platform_Dianqiu_Cal(float hit, uint8_t distance)
 {
    Platform_DataTypeDef *Platform = Platform_GetPlatformPtr();
 
 	if (finishhit == 0 ){
 		 if(DWT_GetTimeline_s() - start_hit_time  <= 0.8f) {
-			 l_tar +=0.05;
-			 LimitMax (l_tar,0.25);
-		   Platform_Set_Target_Pos(0,0,l_tar,0,0,0);
-       Platform_Set_OutputState(Platform_middle);
-
+						switch (distance){
+									 case Remote_SWITCH_UP://jin
+									 l_tar +=0.05;
+									 LimitMax (l_tar,0.3f);
+									 Platform_Set_Target_Pos(0,0,l_tar,-10.0f,0,0);
+									 Platform_Set_OutputState(Platform_middle); 
+										break ;
+									 case Remote_SWITCH_MIDDLE:
+									 l_tar +=0.05;
+									 LimitMax (l_tar,0.3f);
+									 Platform_Set_Target_Pos(0,0,l_tar,0,0,0);
+									 Platform_Set_OutputState(Platform_middle); 
+										break ;
+									 case Remote_SWITCH_DOWN://yuan
+									 l_tar +=0.05;
+									 LimitMax (l_tar,0.3f);
+									 Platform_Set_Target_Pos(0,0,l_tar,0,0,0);
+									 Platform_Set_OutputState(Platform_fast); 
+										break ;
+								}
+			
 		 }else {
 			Platform_Set_OutputState(Platform_slow);	
-			Platform_Set_Target_Pos(0,0,0.13f,0,0,0);
+			Platform_Set_Target_Pos(0,0,0.15f,0,0,0);
 		   start_back_time = DWT_GetTimeline_s();	
 		  finishhit = 1;	
 		 }
@@ -341,12 +359,12 @@ void  Platform_Dianqiu_Cal(float hit)
 		}
 		else {
 		   if((int)hit == 1) {
-			   Platform_Set_Target_Pos(0,0,0.13f,0,0,0);
+			   Platform_Set_Target_Pos(0,0,0.15f,0,0,0);
 		     Platform_Set_OutputState(Platform_middle);
          start_hit_time = DWT_GetTimeline_s();
          finishhit = 0;
 			 }else if((int)hit != 1) {
-				 Platform_Set_Target_Pos(0,0,0.13f,0,0,0);
+				 Platform_Set_Target_Pos(0,0,0.15f,0,0,0);
 			   Platform_Set_OutputState(Platform_middle);
 
 			 }
@@ -366,35 +384,35 @@ void Platform_Control() {
     switch (Platform->ctrl_mode) {
 		case Platform_Test:
 	    Platform_Set_OutputState(Platform_slow);  
-		 Platform_Cal_3Degree_IK_Output(); 
+      Platform_Cal_3Degree_IK_Output(); 
 				    break;			
         case Platform_Dianqiu:
 					
-        Platform_Cal_3Degree_IK_Output();
+  
             break;				
         case Platform_Jiefa:
 	
-				Platform_Cal_3Degree_IK_Output(); 
+          Platform_Cal_3Degree_IK_Output(); 
             break;				
         case Platform_Chuanqiu:
-	      Platform_Set_OutputState(Platform_fast); 
-        Platform_Cal_3Degree_IK_Output(); 
-            break;				
+          Platform_Set_OutputState(Platform_fast); 
+          Platform_Cal_3Degree_IK_Output(); 
+          break;				
         case Platform_Initpose:
-		start_hit_time = 0.0f;
-        start_back_time = 0.0f;
-        finishhit = 1;
-        l_tar = 0.15f;	
-        Platform_Set_OutputState(Platform_slow);  
-        Platform_Set_Target_Pos(0,0,0.15f,0,0,0);  
-        Platform_Cal_3Degree_IK_Output(); 
-            break;
+          start_hit_time = 0.0f;
+          start_back_time = 0.0f;
+          finishhit = 1;
+          l_tar = 0.15f;	
+          Platform_Set_OutputState(Platform_slow);  
+          Platform_Set_Target_Pos(0,0,0.15f,0,0,0);  
+          Platform_Cal_3Degree_IK_Output(); 
+          break;
         case Platform_Stop:
-        Platform_Set_OutputState(Platform_stop);
-        Platform_Set_Torque_Output(0,0,0);
-            break;				
+          Platform_Set_OutputState(Platform_stop);
+          Platform_Set_Torque_Output(0,0,0);
+          break;				
         default:
-            break;
+          break;
     }
 }
  uint8_t output_state;
@@ -405,12 +423,12 @@ void Platform_Output()
     Platform_DataTypeDef *Platform = Platform_GetPlatformPtr(); 
 		
 //while( (output_state !=1) && (DWT_GetTimeline_us()-last_output_time < 150)){}
-     Motor_SendMotorGroupOutput(Motor_groupHandle[0]) ;
+     Motor_SendMotorGroupOutput(Motor_groupHandle[1]) ;
 		// last_output_time = DWT_GetTimeline_us();
 		 DWT_Delayus(150);
 	
 //while( (output_state !=2) && (DWT_GetTimeline_us()-last_output_time < 150)){}
-		 Motor_SendMotorGroupOutput(Motor_groupHandle[1]) ;
+		 Motor_SendMotorGroupOutput(Motor_groupHandle[0]) ;
 	  // last_output_time = DWT_GetTimeline_us();
 		 DWT_Delayus(150);
 

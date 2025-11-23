@@ -1,4 +1,24 @@
 /*
+ * @Author: error: error: git config user.name & please set dead value or install git && error: git config user.email & please set dead value or install git & please set dead value or install git
+ * @Date: 2025-05-27 18:52:54
+ * @LastEditors: error: error: git config user.name & please set dead value or install git && error: git config user.email & please set dead value or install git & please set dead value or install git
+ * @LastEditTime: 2025-10-31 19:09:47
+ * @FilePath: \MDK-ARMd:\Files\xiaobing_origin\xiaobing\Core\Src\Application\app_platform.c
+ * @Description: 
+ * 
+ * Copyright (c) 2025 by ${git_name_email}, All Rights Reserved. 
+ */
+/*
+ * @Author: error: error: git config user.name & please set dead value or install git && error: git config user.email & please set dead value or install git & please set dead value or install git
+ * @Date: 2025-05-27 18:52:54
+ * @LastEditors: error: error: git config user.name & please set dead value or install git && error: git config user.email & please set dead value or install git & please set dead value or install git
+ * @LastEditTime: 2025-10-31 19:03:49
+ * @FilePath: \MDK-ARMd:\Files\xiaobing_origin\xiaobing\Core\Src\Application\app_platform.c
+ * @Description: 
+ * 
+ * Copyright (c) 2025 by ${git_name_email}, All Rights Reserved. 
+ */
+/*
  *  Project      :DeltaPlatform
  * 
  *  file         : app_platform.c
@@ -23,16 +43,16 @@
     for(;;) {   
 
       Platform_Update_Fdb();
-			Platform_Check();
-			if(Platform->error_code == 0){
-      Platform_Control();	 
-      }
-			else{
-      Platform_Set_Torque_Output(0,0,0);
-			}
-			//Platform_Control();
+//			Platform_Check();
+//			if(Platform->error_code == 0){
+//      Platform_Control();	 
+//      }
+//			else{
+//      Platform_Set_Torque_Output(0,0,0);
+//			}
+			Platform_Control();
 			Platform_Output();
 			    
-      osDelay(2);
+      osDelay(100);
     }
 }

@@ -35,6 +35,19 @@ extern const float Const_YawSpdMotorParam[4][5];
 extern const float Const_PitchPosMotorParam[4][5];
 extern const float Const_PitchSpdMotorParam[4][5];
 
+//@twx Rise
+extern const float Const_HitPosMotorParam[4][5];
+extern const float Const_HitSpdMotorParam[4][5];
+
+extern float Const_ChopPosMotorParam[4][5];
+extern float Const_ChopFrontSpdMotorParam[4][5];
+extern float Const_ChopRightSpdMotorParam[4][5];
+extern float Const_ChopLeftSpdMotorParam[4][5];
+
+extern float Const_LiftPosMotorParam[4][5];
+extern float Const_LiftSpdMotorParam[4][5];
+
+
 extern const  float Const_DMmotor_P_MIN    ;
 extern const  float Const_DMmotor_P_MAX    ;
 extern const  float Const_DMmotor_V_MIN    ;
@@ -93,7 +106,11 @@ extern UART_HandleTypeDef* Const_Communicate_UART_HANDLER;
 extern UART_HandleTypeDef* Const_Motor_UART_HANDLER;
 extern UART_HandleTypeDef* Const_DT35_UART_HANDLER;
 extern const float Const_Remote_REMOTE_OFFLINE_TIME;
-extern const float Const_Comm_OFFLINE_TIME;        
+extern const float Const_Comm_OFFLINE_TIME;
+
+extern const float Const_Gimbal_Yaw_OFFSET;
+extern const float Const_Gimbal_Pitch_OFFSET;
+
 #endif
 
 #ifdef __cplusplus

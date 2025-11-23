@@ -141,7 +141,7 @@ void PID_ClearPID(PID_PIDTypeDef* pid) {
     pid->err_watch  = 0;
 }
 
-
+float Error;
 /**
   * @brief      Calculation of PID control quantity
   * @param      pid: The pointer points to the PID controller
@@ -152,7 +152,7 @@ void PID_CalcPID(PID_PIDTypeDef* pid, PID_PIDParamTypeDef* pparam) {
 
     // Position Pid calculate
     if (pparam->pid_mode == PID_POSITION) {
-        float dError, Error, ref_dError, ref_ddError;
+        float dError, ref_dError, ref_ddError;
 
         // Calculate the differential value
         Error = pid->ref - pid->fdb;

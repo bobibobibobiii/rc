@@ -1,0 +1,15 @@
+{
+    "files.associations": {
+        "freertos.h": "c",
+        "module_platform.h": "c",
+        "app_platform.h": "c",
+        "module_rise.h": "c",
+        "sys_const.h": "c",
+        "app_gimbal.h": "c",
+        "module_chassis.h": "c",
+        "util_pidtune.h": "c",
+        "util_vofa.h": "c",
+        "app_rise.h": "c",
+        "sys_dwt.h": "c"
+    }
+}

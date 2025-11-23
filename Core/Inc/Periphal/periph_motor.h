@@ -18,7 +18,7 @@ extern "C" {
 #include "alg_math.h"
 #include "alg_filter.h"
 
-#define MOTOR_GROUP_NUM 8
+#define MOTOR_GROUP_NUM 12
 #define Const_Motor_MOTOR_TX_EXTID  0x01
 #define Const_Motor_MOTOR_TX_DLC    8
 #define Const_Motor_MOTOR_RX_DLC    8
@@ -43,6 +43,7 @@ typedef enum {
 	Motor_TYPE_A1               = 7,
 	Motor_TYPE_LK5005		    = 8,
     Motor_TYPE_Go1              = 9,
+    Motor_TYPE_DMH3510          = 10
 } Motor_MotorTypeEnum;
 
 typedef enum {
@@ -128,6 +129,14 @@ extern Motor_MotorGroupTypeDef Motor_DirectionMotors;  //can1*4
 extern Motor_MotorGroupTypeDef Motor_MoveMotors;       //can2*4
 extern Motor_MotorGroupTypeDef Motor_Gimbal_Motors;     // can2 * 2
 extern Motor_MotorGroupTypeDef Motor_Serve_Motors; 
+//@twx 发球击打板电机
+extern Motor_MotorGroupTypeDef Motor_Rise_Hit_Motors;   
+//@twx 发球搓球3电机
+extern Motor_MotorGroupTypeDef Motor_Rise_Chop_Front_Motors; 
+extern Motor_MotorGroupTypeDef Motor_Rise_Chop_Right_Motors; 
+extern Motor_MotorGroupTypeDef Motor_Rise_Chop_Left_Motors; 
+//@twx发球抬升电机
+extern Motor_MotorGroupTypeDef Motor_Rise_Lift_Motors;
 
 extern Motor_MotorTypeDef Motor_Pitch_Front_Motor;
 extern Motor_MotorTypeDef Motor_Pitch_Left_Motor;
@@ -147,6 +156,15 @@ extern Motor_MotorTypeDef Motor_Gimbal_PitchMotor;
 extern Motor_MotorTypeDef Motor_Serve_LeftMotor;
 extern Motor_MotorTypeDef Motor_Serve_RightMotor;
 
+//@twx 发球击打板电机
+extern Motor_MotorTypeDef Motor_Rise_Hit_Motor;
+//@twx 发球搓球3电机
+extern Motor_MotorTypeDef Motor_Rise_Chop_Front_Motor;
+extern Motor_MotorTypeDef Motor_Rise_Chop_Left_Motor;
+extern Motor_MotorTypeDef Motor_Rise_Chop_Right_Motor;
+//@twx发球抬升电机
+extern Motor_MotorTypeDef Motor_Rise_Lift_Motor;
+
 extern Motor_FuncMotorTypeEnum Motor_ConnectingState;
 void Motor_EncoderDecodeCallback(CAN_HandleTypeDef* phcan, UART_HandleTypeDef* huart, uint32_t stdid, uint8_t rxdata[], uint32_t len);
 void Motor_InitAllMotors(void);
@@ -161,6 +179,7 @@ void Motor_SendMotorGroupsOutput(void);
 uint8_t Motor_IsAnyMotorOffline(void);
 uint8_t Motor_IsMotorOffline(Motor_MotorTypeDef* pmotor);
 
+void Motor_DM_Basic_Output(Motor_MotorGroupTypeDef *pgroup , Motor_DMBasicCtrlEnum basic);
 void Dji3508_origin_encoder_callback(Motor_MotorTypeDef *pmotor, uint8_t rxbuff[], uint32_t len);
 void Dji3508_xroll_encoder_callback(Motor_MotorTypeDef *pmotor, uint8_t rxbuff[], uint32_t len);
 void Dji6020_encoder_callback(Motor_MotorTypeDef *pmotor, uint8_t rxbuff[], uint32_t len);
@@ -169,7 +188,8 @@ void DM4340_encoder_callback(Motor_MotorTypeDef *pmotor, uint8_t rxbuff[], uint3
 void DM8009_encoder_callback(Motor_MotorTypeDef *pmotor, uint8_t rxbuff[], uint32_t len);
 void ECA4310_encoder_callback(Motor_MotorTypeDef *pmotor, uint8_t rxbuff[], uint32_t len);
 void lk5005_encoder_callback(Motor_MotorTypeDef* motor, uint8_t* rxdata, uint32_t len);
-void Go1_encoder_callback(Motor_MotorTypeDef *pmotor, uint8_t rxbuff[], uint32_t len) ;
+void DMH3510_encoder_callback(Motor_MotorTypeDef *pmotor, uint8_t rxbuff[], uint32_t len);
+void Go1_encoder_callback(Motor_MotorTypeDef *pmotor, uint8_t rxbuff[], uint32_t len);
 void A1_encoder_callback(Motor_MotorTypeDef *pmotor, uint8_t rxbuff[], uint32_t len);
 uint32_t crc32_core(uint32_t* ptr, uint32_t len);
 uint16_t crc_ccitt_byte(uint16_t crc, const uint8_t c);

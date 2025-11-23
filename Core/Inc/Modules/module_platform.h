@@ -113,7 +113,7 @@ void Platform_Control(void);
 void Platform_Output(void);
 void Platform_Cal_3Degree_IK_Output() ;
 void Platform_Set_Torque_Output(float torque1,float torque2,float torque3);
-void Platform_Dianqiu_Cal(float hit);
+void Platform_Dianqiu_Cal(float hit,uint8_t distance);
 void Platform_Jiefa_Cal(float hit);
 void Platform_Check();
 #endif

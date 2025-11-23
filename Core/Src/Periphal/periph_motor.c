@@ -18,7 +18,15 @@ Motor_MotorGroupTypeDef Motor_Pitch_Right_Motors;
 Motor_MotorGroupTypeDef Motor_DirectionMotors;  		// can1 * 4
 Motor_MotorGroupTypeDef Motor_MoveMotors;       		// can2 * 4
 Motor_MotorGroupTypeDef Motor_Gimbal_Motors;    		// can2 * 2
-Motor_MotorGroupTypeDef Motor_Serve_Motors;     		// can2 * 2
+Motor_MotorGroupTypeDef Motor_Serve_Motors;  
+//@twx 发球击打板电机
+Motor_MotorGroupTypeDef Motor_Rise_Hit_Motors;  
+//@twx 发球搓球3电机
+Motor_MotorGroupTypeDef Motor_Rise_Chop_Front_Motors; 
+Motor_MotorGroupTypeDef Motor_Rise_Chop_Right_Motors; 
+Motor_MotorGroupTypeDef Motor_Rise_Chop_Left_Motors; 
+//@twx发球抬升电机
+Motor_MotorGroupTypeDef Motor_Rise_Lift_Motors;
 
 Motor_MotorTypeDef Motor_Pitch_Front_Motor;
 Motor_MotorTypeDef Motor_Pitch_Left_Motor;
@@ -39,6 +47,15 @@ Motor_MotorTypeDef Motor_Gimbal_PitchMotor;
 
 Motor_MotorTypeDef Motor_Serve_LeftMotor;
 Motor_MotorTypeDef Motor_Serve_RightMotor;
+
+//@twx 发球击打板电机
+Motor_MotorTypeDef Motor_Rise_Hit_Motor;
+//@twx 发球搓球3电机
+Motor_MotorTypeDef Motor_Rise_Chop_Front_Motor;
+Motor_MotorTypeDef Motor_Rise_Chop_Left_Motor;
+Motor_MotorTypeDef Motor_Rise_Chop_Right_Motor;
+//@twx发球抬升电机
+Motor_MotorTypeDef Motor_Rise_Lift_Motor;
 
 uint8_t Motor_Uart6RxData[Const_Motor_UART_RX_LEN];
 
@@ -82,61 +99,92 @@ void Motor_EncoderDecodeCallback(CAN_HandleTypeDef* phcan, UART_HandleTypeDef* h
   * @retval     NULL
   */
 void Motor_InitAllMotors() {
-   Uart_InitUartDMA(&huart6);
-   Uart_ReceiveDMA(&huart6, Motor_Uart6RxData, Const_Motor_UART_RX_LEN);
-	
-  Motor_groupHandle[0] = &Motor_Pitch_Front_Motors;
-	Motor_InitMotorGroup(&Motor_Pitch_Front_Motors, Motor_TYPE_Go1, 1, NULL, &huart6, 0);
+    Uart_InitUartDMA(&huart6);
+    Uart_ReceiveDMA(&huart6, Motor_Uart6RxData, Const_Motor_UART_RX_LEN);
+
+    Motor_groupHandle[0] = &Motor_Pitch_Front_Motors;
+    Motor_InitMotorGroup(&Motor_Pitch_Front_Motors, Motor_TYPE_Go1, 1, NULL, &huart6, 0);
     Motor_InitMotor(&Motor_Pitch_Front_Motor, Motor_TYPE_Go1, 1, 0.1, Go1_encoder_callback,0);
     Motor_Pitch_Front_Motors.motor_handle[0] = &Motor_Pitch_Front_Motor;
-	
-  Motor_groupHandle[1] = &Motor_Pitch_Left_Motors;
-	Motor_InitMotorGroup(&Motor_Pitch_Left_Motors, Motor_TYPE_Go1, 1, NULL, &huart6, 0);
+
+    Motor_groupHandle[1] = &Motor_Pitch_Left_Motors;
+    Motor_InitMotorGroup(&Motor_Pitch_Left_Motors, Motor_TYPE_Go1, 1, NULL, &huart6, 0);
     Motor_InitMotor(&Motor_Pitch_Left_Motor, Motor_TYPE_Go1, 2, 0.1, Go1_encoder_callback,0);
     Motor_Pitch_Left_Motors.motor_handle[0] = &Motor_Pitch_Left_Motor;
 
-  Motor_groupHandle[2] = &Motor_Pitch_Right_Motors;
-	Motor_InitMotorGroup(&Motor_Pitch_Right_Motors, Motor_TYPE_Go1, 1, NULL, &huart6, 0);
+    Motor_groupHandle[2] = &Motor_Pitch_Right_Motors;
+    Motor_InitMotorGroup(&Motor_Pitch_Right_Motors, Motor_TYPE_Go1, 1, NULL, &huart6, 0);
     Motor_InitMotor(&Motor_Pitch_Right_Motor, Motor_TYPE_Go1, 3, 0.1, Go1_encoder_callback,0);
     Motor_Pitch_Right_Motors.motor_handle[0] = &Motor_Pitch_Right_Motor; 
-	
-  Motor_groupHandle[3] = &Motor_DirectionMotors;
-	Motor_InitMotorGroup(&Motor_DirectionMotors,Motor_TYPE_Dji6020,4, &hcan2,NULL, 0x1FE);
-	Motor_InitMotor( &Motor_RightFront_DirectionMotor, Motor_TYPE_Dji6020, 0x205, 0.1, Dji6020_encoder_callback, Const_DIRECTION_RIGHT_FRONT_MOTOR_INIT_OFFSET);
-	Motor_InitMotor( &Motor_LeftFront_DirectionMotor , Motor_TYPE_Dji6020, 0x206, 0.1, Dji6020_encoder_callback, Const_DIRECTION_LEFT_FRONT_MOTOR_INIT_OFFSET);
-	Motor_InitMotor( &Motor_LeftBack_DirectionMotor  , Motor_TYPE_Dji6020, 0x207, 0.1, Dji6020_encoder_callback, Const_DIRECTION_LEFT_BACK_MOTOR_INIT_OFFSET);
-	Motor_InitMotor( &Motor_RightBack_DirectionMotor , Motor_TYPE_Dji6020, 0x208, 0.1, Dji6020_encoder_callback, Const_DIRECTION_RIGHT_BACK_MOTOR_INIT_OFFSET);
-	Motor_DirectionMotors.motor_handle[0] = &Motor_RightFront_DirectionMotor;
-	Motor_DirectionMotors.motor_handle[1] = &Motor_LeftFront_DirectionMotor;
-	Motor_DirectionMotors.motor_handle[2] = &Motor_LeftBack_DirectionMotor;
-	Motor_DirectionMotors.motor_handle[3] = &Motor_RightBack_DirectionMotor;
 
-  Motor_groupHandle[4] = &Motor_MoveMotors;
+    Motor_groupHandle[3] = &Motor_DirectionMotors;
+    Motor_InitMotorGroup(&Motor_DirectionMotors,Motor_TYPE_Dji6020,4, &hcan2,NULL, 0x1FE);
+    Motor_InitMotor( &Motor_RightFront_DirectionMotor, Motor_TYPE_Dji6020, 0x205, 0.1, Dji6020_encoder_callback, Const_DIRECTION_RIGHT_FRONT_MOTOR_INIT_OFFSET);
+    Motor_InitMotor( &Motor_LeftFront_DirectionMotor , Motor_TYPE_Dji6020, 0x206, 0.1, Dji6020_encoder_callback, Const_DIRECTION_LEFT_FRONT_MOTOR_INIT_OFFSET);
+    Motor_InitMotor( &Motor_LeftBack_DirectionMotor  , Motor_TYPE_Dji6020, 0x207, 0.1, Dji6020_encoder_callback, Const_DIRECTION_LEFT_BACK_MOTOR_INIT_OFFSET);
+    Motor_InitMotor( &Motor_RightBack_DirectionMotor , Motor_TYPE_Dji6020, 0x208, 0.1, Dji6020_encoder_callback, Const_DIRECTION_RIGHT_BACK_MOTOR_INIT_OFFSET);
+    Motor_DirectionMotors.motor_handle[0] = &Motor_RightFront_DirectionMotor;
+    Motor_DirectionMotors.motor_handle[1] = &Motor_LeftFront_DirectionMotor;
+    Motor_DirectionMotors.motor_handle[2] = &Motor_LeftBack_DirectionMotor;
+    Motor_DirectionMotors.motor_handle[3] = &Motor_RightBack_DirectionMotor;
+
+    Motor_groupHandle[4] = &Motor_MoveMotors;
     Motor_InitMotorGroup(&Motor_MoveMotors,Motor_TYPE_Dji3508_xroll,4 ,&hcan1, NULL,0x200);
     Motor_InitMotor( &Motor_RightFront_MoveMotor, Motor_TYPE_Dji3508_xroll,  0x201, 0.1,  Dji3508_xroll_encoder_callback,0);
-	Motor_InitMotor( &Motor_LeftFront_MoveMotor , Motor_TYPE_Dji3508_xroll,  0x202, 0.1,  Dji3508_xroll_encoder_callback,0);
+    Motor_InitMotor( &Motor_LeftFront_MoveMotor , Motor_TYPE_Dji3508_xroll,  0x202, 0.1,  Dji3508_xroll_encoder_callback,0);
     Motor_InitMotor( &Motor_LeftBack_MoveMotor  , Motor_TYPE_Dji3508_xroll,  0x203, 0.1,  Dji3508_xroll_encoder_callback,0);
     Motor_InitMotor( &Motor_RightBack_MoveMotor , Motor_TYPE_Dji3508_xroll,  0x204, 0.1,  Dji3508_xroll_encoder_callback,0);
-	Motor_MoveMotors.motor_handle[0] = &Motor_RightFront_MoveMotor;
-	Motor_MoveMotors.motor_handle[1] = &Motor_LeftFront_MoveMotor;
-	Motor_MoveMotors.motor_handle[2] = &Motor_LeftBack_MoveMotor;
-	Motor_MoveMotors.motor_handle[3] = &Motor_RightBack_MoveMotor;
- 
-  Motor_groupHandle[5] = &Motor_Serve_Motors;
-	Motor_InitMotorGroup(&Motor_Serve_Motors ,Motor_TYPE_Dji3508_origin,2, &hcan2  ,NULL,  0x200);
-	Motor_InitMotor(&Motor_Serve_LeftMotor, Motor_TYPE_Dji3508_origin, 0x201, 0.1, Dji3508_origin_encoder_callback,0);
-	Motor_InitMotor(&Motor_Serve_RightMotor, Motor_TYPE_Dji3508_origin, 0x202, 0.1, Dji3508_origin_encoder_callback,0);
-	Motor_Serve_Motors.motor_handle[0] = &Motor_Serve_LeftMotor;
-	Motor_Serve_Motors.motor_handle[1] = &Motor_Serve_RightMotor;
-		
-  Motor_groupHandle[6] = &Motor_Gimbal_Motors;
-	Motor_InitMotorGroup(&Motor_Gimbal_Motors, Motor_TYPE_Dji6020, 4, &hcan2, NULL, 0x1FE);
-	Motor_InitMotor(&Motor_Gimbal_YawMotor, Motor_TYPE_Dji6020, 0x206, 0.1, Dji6020_encoder_callback,0);
-	Motor_InitMotor(&Motor_Gimbal_PitchMotor, Motor_TYPE_Dji6020, 0x208, 0.1, Dji6020_encoder_callback,0);
-	Motor_Gimbal_Motors.motor_handle[0] = NULL;
-	Motor_Gimbal_Motors.motor_handle[1] = &Motor_Gimbal_YawMotor;
-	Motor_Gimbal_Motors.motor_handle[2] = NULL;
-	Motor_Gimbal_Motors.motor_handle[3] = &Motor_Gimbal_PitchMotor;
+    Motor_MoveMotors.motor_handle[0] = &Motor_RightFront_MoveMotor;
+    Motor_MoveMotors.motor_handle[1] = &Motor_LeftFront_MoveMotor;
+    Motor_MoveMotors.motor_handle[2] = &Motor_LeftBack_MoveMotor;
+    Motor_MoveMotors.motor_handle[3] = &Motor_RightBack_MoveMotor;
+
+    Motor_groupHandle[5] = &Motor_Serve_Motors;
+    Motor_InitMotorGroup(&Motor_Serve_Motors ,Motor_TYPE_Dji3508_origin,2, &hcan1  ,NULL,  0x1FF);
+    Motor_InitMotor(&Motor_Serve_LeftMotor, Motor_TYPE_Dji3508_origin, 0x205, 0.1, Dji3508_origin_encoder_callback,0);
+    Motor_InitMotor(&Motor_Serve_RightMotor, Motor_TYPE_Dji3508_origin, 0x206, 0.1, Dji3508_origin_encoder_callback,0);
+    Motor_Serve_Motors.motor_handle[0] = &Motor_Serve_LeftMotor;
+    Motor_Serve_Motors.motor_handle[1] = &Motor_Serve_RightMotor;
+        
+    Motor_groupHandle[6] = &Motor_Gimbal_Motors;
+    Motor_InitMotorGroup(&Motor_Gimbal_Motors, Motor_TYPE_Dji6020, 2, &hcan2, NULL, 0x2FE);
+    Motor_InitMotor(&Motor_Gimbal_YawMotor, Motor_TYPE_Dji6020, 0x209, 0.1, Dji6020_encoder_callback,0);
+    Motor_InitMotor(&Motor_Gimbal_PitchMotor, Motor_TYPE_Dji6020, 0x20A, 0.1, Dji6020_encoder_callback,0);
+    Motor_Gimbal_Motors.motor_handle[0] = &Motor_Gimbal_YawMotor;
+    Motor_Gimbal_Motors.motor_handle[1] = &Motor_Gimbal_PitchMotor;
+    Motor_Gimbal_Motors.motor_handle[2] = NULL;
+    Motor_Gimbal_Motors.motor_handle[3] = NULL;
+
+    Motor_groupHandle[7] = &Motor_Rise_Hit_Motors;
+    Motor_InitMotorGroup(&Motor_Rise_Hit_Motors, Motor_TYPE_Go1, 1, NULL, &huart6, 0);
+    Motor_InitMotor(&Motor_Rise_Hit_Motor, Motor_TYPE_Go1, 1, 0.1, Go1_encoder_callback,0);
+    Motor_Rise_Hit_Motors.motor_handle[0] = &Motor_Rise_Hit_Motor;
+
+    Motor_groupHandle[8] = &Motor_Rise_Chop_Front_Motors;
+    Motor_InitMotorGroup(&Motor_Rise_Chop_Front_Motors, Motor_TYPE_DMH3510, 1, &hcan1, NULL, 0x01);
+    Motor_InitMotor(&Motor_Rise_Chop_Front_Motor, Motor_TYPE_DMH3510, 0x01, 0.1, DMH3510_encoder_callback,0);
+    Motor_Rise_Chop_Front_Motors.motor_handle[0] = &Motor_Rise_Chop_Front_Motor;
+
+    Motor_groupHandle[9] = &Motor_Rise_Chop_Right_Motors;
+    Motor_InitMotorGroup(&Motor_Rise_Chop_Right_Motors, Motor_TYPE_DMH3510, 1, &hcan1, NULL, 0x02);
+    Motor_InitMotor(&Motor_Rise_Chop_Right_Motor, Motor_TYPE_DMH3510, 0x02, 0.1, DMH3510_encoder_callback,0);
+    Motor_Rise_Chop_Right_Motors.motor_handle[0] = &Motor_Rise_Chop_Right_Motor;
+
+    Motor_groupHandle[10] = &Motor_Rise_Chop_Left_Motors;
+    Motor_InitMotorGroup(&Motor_Rise_Chop_Left_Motors, Motor_TYPE_DMH3510, 1, &hcan1, NULL, 0x03);
+    Motor_InitMotor(&Motor_Rise_Chop_Left_Motor, Motor_TYPE_DMH3510, 0x03, 0.1, DMH3510_encoder_callback,0);
+    Motor_Rise_Chop_Left_Motors.motor_handle[0] = &Motor_Rise_Chop_Left_Motor;
+
+    Motor_groupHandle[11] = &Motor_Rise_Lift_Motors;
+    Motor_InitMotorGroup(&Motor_Rise_Lift_Motors,Motor_TYPE_Dji3508_origin,1,&hcan1, NULL,0x1FF);
+    Motor_InitMotor( &Motor_Rise_Lift_Motor, Motor_TYPE_Dji3508_origin,  0x205, 0.1,  Dji3508_origin_encoder_callback,0);
+    Motor_Rise_Lift_Motors.motor_handle[0] = &Motor_Rise_Lift_Motor;
+    Motor_Rise_Lift_Motors.motor_handle[1] = NULL;
+    Motor_Rise_Lift_Motors.motor_handle[2] = NULL;
+    Motor_Rise_Lift_Motors.motor_handle[3] = NULL;
+
+
+
 }   
 /**
   * @brief      Initialize the motor
@@ -174,7 +222,7 @@ void  Motor_InitMotorGroup(Motor_MotorGroupTypeDef* pgroup, Motor_MotorTypeEnum 
       pgroup->type = type;
 	
 	if (type == Motor_TYPE_DM8009 || type == Motor_TYPE_DM4310 || type == Motor_TYPE_DM4340 
-	  || type == Motor_TYPE_Dji3508_xroll || type == Motor_TYPE_Dji3508_origin || type == Motor_TYPE_LK5005 || type == Motor_TYPE_Dji6020 ) {
+	  || type == Motor_TYPE_Dji3508_xroll || type == Motor_TYPE_Dji3508_origin || type == Motor_TYPE_LK5005 || type == Motor_TYPE_Dji6020 || type == Motor_TYPE_DMH3510) {
         if (phcan == NULL) return;
         pgroup->can_handle = phcan;
         Can_InitTxHeader(&(pgroup->can_header), stdid, 0, 8);
@@ -217,7 +265,6 @@ uint16_t Motor_GetMotorOutput(Motor_MotorTypeDef* pmotor) {
 			ret = (int16_t)(pmotor->output / 6.33f * 256.0f);
 			  return (uint16_t)ret;
 			  }
-	return 0;
 }
 
 uint32_t Motor_GetLKMotorOutput(Motor_MotorTypeDef* pmotor)
@@ -230,6 +277,7 @@ uint32_t Motor_GetLKMotorOutput(Motor_MotorTypeDef* pmotor)
         }
 	return 0;
 }
+
 
 uint8_t txdata[64];
 void Motor_SendMotorGroupOutput(Motor_MotorGroupTypeDef *pgroup) {
@@ -250,7 +298,7 @@ void Motor_SendMotorGroupOutput(Motor_MotorGroupTypeDef *pgroup) {
 	Can_SendMessage(pgroup->can_handle, &(pgroup->can_header), txdata);
     }
 	
-	else if (pgroup->type == Motor_TYPE_DM4310 || pgroup->type == Motor_TYPE_DM4340 ||pgroup->type == Motor_TYPE_DM8009 ) {
+	else if (pgroup->type == Motor_TYPE_DM4310 || pgroup->type == Motor_TYPE_DM4340 ||pgroup->type == Motor_TYPE_DM8009 || pgroup->type == Motor_TYPE_DMH3510) {
 		 uint16_t  pos_tmp,vel_tmp,kp_tmp,kd_tmp,tor_tmp;
 		 pos_tmp = float_to_uint(0, Const_DMmotor_P_MIN, Const_DMmotor_P_MAX, 16);
 		 kp_tmp = float_to_uint(0, Const_DMmotor_KP_MIN, Const_DMmotor_KP_MAX, 12);
@@ -268,6 +316,10 @@ void Motor_SendMotorGroupOutput(Motor_MotorGroupTypeDef *pgroup) {
 			case Motor_TYPE_DM8009 :
 				vel_tmp = float_to_uint(0, -45, 45, 12);
 				tor_tmp = float_to_uint(pgroup->motor_handle[0]->output  , -54, 54, 12);
+				break;
+            case Motor_TYPE_DMH3510 :
+				vel_tmp = float_to_uint(0,-280, 280, 12);
+				tor_tmp = float_to_uint(pgroup->motor_handle[0]->output  , -12.5, 12.5, 12);
 				break;
 			default:
 				 break;
@@ -316,23 +368,27 @@ void Motor_Send_MIT_Output(Motor_MotorGroupTypeDef *pgroup)
 
     pos_tmp = float_to_uint(pgroup->dmoutput.position, Const_DMmotor_P_MIN, Const_DMmotor_P_MAX, 16);
     kp_tmp = float_to_uint(pgroup->dmoutput.KP, Const_DMmotor_KP_MIN, Const_DMmotor_KP_MAX, 12);
-	  kd_tmp = float_to_uint(pgroup->dmoutput.KD, Const_DMmotor_KD_MIN, Const_DMmotor_KD_MAX, 12);
+	kd_tmp = float_to_uint(pgroup->dmoutput.KD, Const_DMmotor_KD_MIN, Const_DMmotor_KD_MAX, 12);
 	
 	switch (pgroup->motor_handle[0]->type){
-		case Motor_TYPE_DM4310 :
-	 vel_tmp = float_to_uint(pgroup->dmoutput.velocity, -30, 30, 12);
-   tor_tmp = float_to_uint(pgroup->dmoutput.torque, -10, 10, 12);
-	break;
-			case Motor_TYPE_DM4340 :
-	 vel_tmp = float_to_uint(pgroup->dmoutput.velocity, -30, 30, 12);
-   tor_tmp = float_to_uint(pgroup->dmoutput.torque, -28, 28, 12);
-	break;
-				case Motor_TYPE_DM8009 :
-	 vel_tmp = float_to_uint(pgroup->dmoutput.velocity, -45, 45, 12);
-   tor_tmp = float_to_uint(pgroup->dmoutput.torque, -54, 54, 12);
-	break;
-	 default:
-            break;
+	case Motor_TYPE_DM4310 :
+        vel_tmp = float_to_uint(pgroup->dmoutput.velocity, -30, 30, 12);
+        tor_tmp = float_to_uint(pgroup->dmoutput.torque, -10, 10, 12);
+	    break;
+    case Motor_TYPE_DM4340 :
+        vel_tmp = float_to_uint(pgroup->dmoutput.velocity, -30, 30, 12);
+        tor_tmp = float_to_uint(pgroup->dmoutput.torque, -28, 28, 12);
+	    break;
+    case Motor_TYPE_DM8009 :
+        vel_tmp = float_to_uint(pgroup->dmoutput.velocity, -45, 45, 12);
+        tor_tmp = float_to_uint(pgroup->dmoutput.torque, -54, 54, 12);
+	    break;
+    case Motor_TYPE_DMH3510 :
+        vel_tmp = float_to_uint(pgroup->dmoutput.velocity, -280, 280, 12);
+        tor_tmp = float_to_uint(pgroup->dmoutput.torque, -12.5, 12.5, 12);
+        break;
+    default:
+        break;
 	}
    
     txbuff[0] = (pos_tmp >> 8);
@@ -346,11 +402,12 @@ void Motor_Send_MIT_Output(Motor_MotorGroupTypeDef *pgroup)
 
     Can_SendMessage(pgroup->can_handle, &(pgroup->can_header), txbuff);
 }
- 
+
+uint8_t txbuff[8];
  void Motor_DM_Basic_Output(Motor_MotorGroupTypeDef *pgroup , Motor_DMBasicCtrlEnum basic)
  {
     if (pgroup == NULL) return;
-    uint8_t txbuff[8];
+    // uint8_t txbuff[8];
     txbuff[0] = 0xFF;
     txbuff[1] = 0xFF;
     txbuff[2] = 0xFF;
@@ -376,7 +433,7 @@ void Motor_Send_MIT_Output(Motor_MotorGroupTypeDef *pgroup)
     txbuff[7] = 0xFB;
         break;
     }
-  	HAL_Delay(500);
+  	//HAL_Delay(500);
     Can_SendMessage(pgroup->can_handle, &(pgroup->can_header), txbuff);	
  }
 
@@ -490,22 +547,103 @@ void Motor_Send_MIT_Output(Motor_MotorGroupTypeDef *pgroup)
     
 }
 
+void DMH3510_encoder_callback(Motor_MotorTypeDef *pmotor, uint8_t rxbuff[], uint32_t len) {
+    
+    if (pmotor == NULL) return;
+    if (len != 8) return;
+
+    // 保存上一时刻的原始角度 (用于多圈计数)
+    pmotor->encoder.last_angle = pmotor->encoder.angle;
+
+    pmotor->encoder.error_code = rxbuff[0] >> 4; // 获取高4位的错误状态
+    uint8_t motor_id = rxbuff[0] & 0x0F; // 获取低4位的ID
+
+    pmotor->encoder.angle  = uint_to_float((rxbuff[1]<<8)|rxbuff[2], Const_DMmotor_P_MIN,Const_DMmotor_P_MAX, 16)*180/PI;
+    pmotor->encoder.speed  = (uint_to_float((rxbuff[3]<<4)|(rxbuff[4]>>4), -280, 280, 12));  
+    pmotor->encoder.torque = uint_to_float(((rxbuff[4]&0xF)<<8)|rxbuff[5],-12.5, 12.5, 12);
+    pmotor->encoder.temp = rxbuff[7]; 
+    
+    // 多圈计数 
+    if (pmotor->init == 0) {
+        pmotor->encoder.last_angle = pmotor->encoder.angle; // 首次接收，初始化
+        pmotor->encoder.round_count = 0;
+        pmotor->init = 1;
+    } else {
+        // 16位原始数据 (65536) 的溢出判断
+        int diff = pmotor->encoder.angle - pmotor->encoder.last_angle;
+        if (diff < -180) { // 最小值 -> 最大值 (正转)
+            pmotor->encoder.round_count++;
+        } else if (diff > 180) { // 最大值 -> 最小值 (反转)
+            pmotor->encoder.round_count--;
+        }
+    }
+    // 计算连续角度
+    // DM-H3510 减速比为 1:1 [cite: 240]
+    pmotor->encoder.consequent_angle = (float)pmotor->encoder.round_count * 360 + pmotor->encoder.angle;
+
+
+    pmotor->type = Motor_TYPE_DMH3510;
+    pmotor->update_dt = DWT_GetDeltaT(&pmotor->last_update_tick);
+    
+}
+
 extern uint64_t output_state;
 void Go1_encoder_callback(Motor_MotorTypeDef *pmotor, uint8_t rxbuff[], uint32_t len) {
 	
     if (pmotor == NULL) return;
     if (len != 16) return;
     if ((rxbuff[0] != 0XFD) || (rxbuff[1] != 0XEE)) return; 
+
+
+    // 2. 解析原始物理数据 (Raw Data)
+    // 注意：先不要直接赋值给 pmotor->encoder.angle，否则会覆盖掉去皮逻辑
+    
+    // 解析角度 (Raw Angle)
+    // Go1 数据格式: 4字节 int32, 单位 rad, 需要转换
+    // 公式: (raw_int / 16384.0) * 180.0 (转为度) / 减速比 6.33
+    int32_t raw_angle_int = (int32_t)((uint32_t)rxbuff[7] | (uint32_t)rxbuff[8] << 8 | (uint32_t)rxbuff[9] << 16 | (uint32_t)rxbuff[10] << 24);
+    float raw_angle = (float)raw_angle_int * 180.0f / 16384.0f / 6.33f;
+
+    // 解析速度 (Speed)
+    int16_t raw_speed_int = (int16_t)((uint16_t)rxbuff[5] | (uint16_t)rxbuff[6] << 8);
+    float current_speed = (float)raw_speed_int / 128.0f * 3.1415926f / 6.33f; // PI = 3.14...
+
+    // 解析力矩 (Torque)
+    int16_t raw_torque_int = (int16_t)((uint16_t)rxbuff[3] | (uint16_t)rxbuff[4] << 8);
+    float current_torque = (float)raw_torque_int / 256.0f * 6.33f;
+
+    // 解析其他数据
+    float current_temp = (float)((uint32_t)rxbuff[11]);
+    uint8_t error_code = rxbuff[12];
+
+
+    // 3. ！！！ 关键逻辑：上电自动归零 (Tare) ！！！
+    if (pmotor->init == 0) {
+        // 第一次收到数据，将当前“原始角度”记录为“初始偏移量”
+        pmotor->encoder.init_offset = raw_angle;
+        
+        // 初始化上一时刻角度，防止第一帧计算多圈时出错
+        pmotor->encoder.last_angle = 0.0f; 
+        pmotor->encoder.round_count = 0;
+        
+        // 标记已初始化
+        pmotor->init = 1;
+    }
+
+    // 4. 计算相对角度 (用户看到的角度)
+    // 现在的角度 = 原始绝对角度 - 初始偏移量
+    // 这样上电那一刻，angle 就会等于 0
+    float relative_angle = raw_angle - pmotor->encoder.init_offset;
 //  	if(pmotor == &Motor_Pitch_Front_Motor){output_state =2;}
 //	  if(pmotor == &Motor_Pitch_Left_Motor ){output_state =3;}
 //	  if(pmotor == &Motor_Pitch_Right_Motor){output_state =1;}
     // Assign a value to the previous angle and get the latest angle
     pmotor->encoder.last_angle = pmotor->encoder.angle;
-    pmotor->encoder.angle   = (float)((int32_t)((uint32_t)rxbuff[7] | (uint32_t)rxbuff[8] << 8 | (uint32_t)rxbuff[9] << 16 | (uint32_t)rxbuff[10] << 24)) * 180.0f / 16384.0f / 6.33f;
-    pmotor->encoder.speed   = (float)((int16_t)((uint16_t)rxbuff[5] | (uint16_t)rxbuff[6] << 8) / 128.0f * PI) / 6.33f;
-    pmotor->encoder.torque  = (float)((int16_t)((uint16_t)rxbuff[3] | (uint16_t)rxbuff[4] << 8) / 256.0f * 6.33f);
-    pmotor->encoder.temp    = (float)((uint32_t)rxbuff[11]);
-		pmotor->encoder.error_code = rxbuff[12];
+    pmotor->encoder.angle   = relative_angle;
+    pmotor->encoder.speed   = current_speed;
+    pmotor->encoder.torque  = current_torque;
+    pmotor->encoder.temp    = current_temp;
+	pmotor->encoder.error_code = rxbuff[12];
     pmotor->encoder.limited_angle = pmotor->encoder.angle;
     pmotor->encoder.consequent_angle = pmotor->encoder.angle;
     pmotor->type = Motor_TYPE_Go1;
@@ -620,7 +758,7 @@ void Dji3508_origin_encoder_callback(Motor_MotorTypeDef* motor, uint8_t* rxdata,
 	}
 
 	// Calculate continuous angle
-	motor->encoder.consequent_angle = ((float)(motor->encoder.angle / 8192.0f * 360.0f) + (float)(motor->encoder.round_count * 360.0f)) / (3591.0f / 187.0f);
+	motor->encoder.consequent_angle = ((float)(motor->encoder.angle / 8192.0f * 360.0f) + (float)(motor->encoder.round_count * 360.0f)) / (3591.0f / 187.0f) - motor->encoder.init_offset;
 	
 	if(motor->encoder.round_count > 10000)
 	{
@@ -703,6 +841,7 @@ void Dji3508_xroll_encoder_callback(Motor_MotorTypeDef* motor, uint8_t* rxdata, 
 
 	motor->type = Motor_TYPE_Dji3508_xroll;
 	motor->update_dt = DWT_GetDeltaT(&motor->last_update_tick);
+    motor->watchdog = 0; 
 }
 
 void Dji6020_encoder_callback(Motor_MotorTypeDef *pmotor, uint8_t rxbuff[], uint32_t len) {

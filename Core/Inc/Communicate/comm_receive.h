@@ -18,7 +18,7 @@ extern "C" {
 
 #include "main.h"
 
-#define Const_Comm_Receive_BUFF_SIZE 2
+#define Const_Comm_Receive_BUFF_SIZE 3
 
 
 typedef struct {

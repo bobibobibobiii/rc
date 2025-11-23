@@ -1,4 +1,14 @@
 /*
+ * @Author: error: error: git config user.name & please set dead value or install git && error: git config user.email & please set dead value or install git & please set dead value or install git
+ * @Date: 2025-05-25 18:03:38
+ * @LastEditors: error: error: git config user.name & please set dead value or install git && error: git config user.email & please set dead value or install git & please set dead value or install git
+ * @LastEditTime: 2025-10-31 20:50:22
+ * @FilePath: \MDK-ARMd:\Files\xiaobing_origin\xiaobing\Core\Inc\Application\app_remote.h
+ * @Description: 
+ * 
+ * Copyright (c) 2025 by ${git_name_email}, All Rights Reserved. 
+ */
+/*
  *  Project      : Polaris Robot 
  *  
  *  FilePath     : app_remote.h
@@ -36,6 +46,7 @@ void Remote_RemoteProcess(void);
 void Remote_RemoteProcessPlus(void);
 void Remote_KeyMouseProcess(void);
 void Remote_NucProcess(void);
+void Remote_RiseProcess(void);
 uint8_t Remote_Gesturejudge(void);
 void Remote_Gesture(void);
 void Remote_GestureFunction_1(void);

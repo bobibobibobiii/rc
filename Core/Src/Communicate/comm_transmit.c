@@ -20,6 +20,7 @@
 
 #include "module_platform.h"
 #include "app_gimbal.h"
+#include "app_gimbal.h"
 
 static uint32_t _send_Remote_data(uint8_t *buff);
 static uint32_t _send_Platform_data(uint8_t *buff);
@@ -27,9 +28,7 @@ static uint32_t _send_Gimbal_data(uint8_t *buff);
 
 
 Comm_SendEntry CommCmd_Send[Const_Comm_Transmit_BUFF_SIZE] = {
-  //   { _send_Gimbal_data},
-	  { _send_Remote_data },
-   { _send_Platform_data},
+       { _send_Gimbal_data}
 };
 
  static uint32_t _send_Remote_data(uint8_t *buff) {
@@ -65,12 +64,10 @@ Platform_DataTypeDef *Platform = Platform_GetPlatformPtr();
 
 static uint32_t _send_Gimbal_data(uint8_t *buff) {
     
-Gimbal_DataTypeDef *gimbal = Gimbal_GetDataPtr();
+	Gimbal_TypeDef *gimbal = Gimbal_GetPtr();
 
-  
-     float2buff( gimbal->Yaw_fdb, buff);
-     float2buff( gimbal->Pitch_fdb, buff+4);
-
+    float2buff( gimbal->Yaw_fdb, buff);
+    float2buff( gimbal->Pitch_fdb, buff + 4);
 
     return 8;
 }

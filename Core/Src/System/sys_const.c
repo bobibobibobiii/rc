@@ -1,14 +1,3 @@
-/*
- *  Project      : Polaris Robot 
- *  
- *  FilePath     : sys_const.c
- *  Description  : This file include all required constants
- *  LastEditors  : Polaris
- *  Date         : 2023-01-23 03:20:29
- *  LastEditTime : 2024-01-09 14:57:59
- */
-
-
 #include "sys_const.h"
 
 const float root3 = 1.73205;
@@ -61,7 +50,7 @@ const float Const_Chassis_Steer_Ang_Param[4][5] = {
 };
 
 const float Const_Chassis_Steer_Spd_Param[4][5] = {
-	{0.15f, 0.01f, 0.0f, 5.0f, 2.0f}, 
+	{0.15f, 0.01f, 0.0f, 2.0f, 2.0f}, 
 	{0.1f, -1.0f}, {0.0f, 0.0f}, {-1.0f, -1.0f}
 };
 
@@ -73,46 +62,88 @@ const float Const_Chassis_Wheel_Spd_Param[4][5] = {
 
 // PID Parameters for Serve
 const float Const_LeftPosMotorParam[4][5] = {
-  {0.4f, 0.0f, 0.0f, 0.0f, 30.0f},
+  {0.25f, 0.0f, 0.0f, 0.0f, 22.0f},
   {0.1f, -1}, {0, 0}, {-1, -1}
 };
 
 const float Const_LeftSpdMotorParam[4][5] = {
-  {1.8f, 0.01f, 0.0f, 0.0f, 3.5f},
+  {1.5f, 0.0f, 0.0f, 0.0f, 3.5f},
   {0.1f, -1}, {0, 0}, {-1, -1}
 };
 
 const float Const_RightPosMotorParam[4][5] = {
-  {0.4f, 0.0f, 0.0f, 0.0f, 30.0f},
+  {0.25f, 0.0f, 0.0f, 0.0f, 22.0f},
   {0.1f, -1}, {0, 0}, {-1, -1}
 };
 
 const float Const_RightSpdMotorParam[4][5] = {
-  {1.8f, 0.01f, 0.0f, 0.0f, 3.5f},
+  {1.5f, 0.0f, 0.0f, 0.0f, 3.5f},
   {0.1f, -1}, {0, 0}, {-1, -1}
 };
 
 
 // PID Parameters for Gimbal
 const float Const_YawPosMotorParam[4][5] = {
-	{1.5f, 0.0f, 0.0f, 0.0f, 25.0f},
+	{1.3f, 0.1f, 0.0f, 5.0f, 17.0f},
 	{0.1f, -1}, {0, 0}, {-1, -1}	
 };
 
 const float Const_YawSpdMotorParam[4][5] = {
-	{0.06f, 0.0f, 0.0f, 0.0f, 1.3f},
+	{0.06f, 0.005f, 0.0f, 0.5f, 1.3f},
 	{0.1f, -1}, {0, 0}, {-1, -1}	
 };
 
 const float Const_PitchPosMotorParam[4][5] = {
-	{0.8f, 0.01f, 0.5f, 5.0f, 17.0f},
+	{0.7f, 0.0f, 2.0f, 150.0f, 17.0f},//0.8 0.01 0.5 5 17
 	{0.1f, -1}, {0, 0}, {-1, -1}	
 };
 
 const float Const_PitchSpdMotorParam[4][5] = {
-	{0.07f, 0.01f, 0.0f, 2.0f, 1.3f},
+	{0.07f, 0.01f, 0.0f, 2.0f, 1.3f}, //0.07
 	{0.1f, -1}, {0, 0}, {-1, -1}	
 };
+
+//@twx PID Parameters for Rise
+const float Const_HitPosMotorParam[4][5] = {
+	{0.9f, 0.01f, 10.0f, 120.0f, 15.0f},
+	{0.1f, -1}, {0, 0}, {-1, -1}	
+};
+
+const float Const_HitSpdMotorParam[4][5] = {
+	{0.8f, 0.01f, 0.0f, 100.0f, 24.0f},
+	{0.1f, -1}, {0, 0}, {-1, -1}	
+};
+
+float Const_ChopPosMotorParam[4][5] = {
+	{0.9f, 0.01f, 10.0f, 120.0f, 15.0f},
+	{0.1f, -1}, {0, 0}, {-1, -1}	
+};
+
+float Const_ChopFrontSpdMotorParam[4][5] = {
+	{0.1f, 0.001f, 0.0f, 100.0f, 24.0f},
+	{0.1f, -1}, {0, 0}, {-1, -1}	
+};
+
+float Const_ChopRightSpdMotorParam[4][5] = {
+	{0.1f, 0.001f, 0.0f, 100.0f, 24.0f},
+	{0.1f, -1}, {0, 0}, {-1, -1}	
+};
+
+float Const_ChopLeftSpdMotorParam[4][5] = {
+	{0.1f, 0.001f, 0.0f, 100.0f, 24.0f},
+	{0.1f, -1}, {0, 0}, {-1, -1}	
+};
+
+float Const_LiftPosMotorParam[4][5] = {
+	{0.1f, 0.01f, 0.0f, 120.0f, 15.0f},
+	{0.1f, -1}, {0, 0}, {-1, -1}	
+};
+
+float Const_LiftSpdMotorParam[4][5] = {
+	{0.9f, 0.7f, 0.0f, 0.0f, 3.4f},
+	{0.1f, -1}, {0, 0}, {-1, -1}	
+};
+
 
 
 const float Const_Platform_Big_Arm_Length = 0.2145 ;
@@ -121,11 +152,11 @@ const float Const_Platform_Static_Plat_Radius = 0.065 ;
 const float Const_Platform_Dynamic_Plat_Radius = 0.2 ;
 const float Const_Chassis_Steeringwheel_Radius = 0.333 ;
 
-//ÕýÎªÄæÊ±Õë
+//ï¿½ï¿½Îªï¿½ï¿½Ê±ï¿½ï¿½
 const float Const_DIRECTION_RIGHT_FRONT_MOTOR_INIT_OFFSET =  -116.0f;
-const float Const_DIRECTION_LEFT_FRONT_MOTOR_INIT_OFFSET  =   65.0f ;
-const float Const_DIRECTION_LEFT_BACK_MOTOR_INIT_OFFSET   =  -60.0f;
-const float Const_DIRECTION_RIGHT_BACK_MOTOR_INIT_OFFSET  =  -8.0f;
+const float Const_DIRECTION_LEFT_FRONT_MOTOR_INIT_OFFSET  =   67.0f ;
+const float Const_DIRECTION_LEFT_BACK_MOTOR_INIT_OFFSET   =  -54.0f;
+const float Const_DIRECTION_RIGHT_BACK_MOTOR_INIT_OFFSET  =  6.0f;
 
 const float Const_DIRECTION_RIGHT_FRONT_MOTOR_INIT_OFFSET_TEST = 64.0f;
 const float Const_DIRECTION_LEFT_FRONT_MOTOR_INIT_OFFSET_TEST = 245.0f;
@@ -148,5 +179,5 @@ UART_HandleTypeDef* Const_DT35_UART_HANDLER         = &huart8;
 const float Const_Remote_REMOTE_OFFLINE_TIME        = 1.0f;
 const float Const_Comm_OFFLINE_TIME                 = 0.5f;
 
-const float Const_Gimbal_Yaw_OFFSET						= 91.0f;
-const float Const_Gimbal_Pitch_OFFSET					= 279.0f;
+const float Const_Gimbal_Yaw_OFFSET						= -30.0f;
+const float Const_Gimbal_Pitch_OFFSET					= 180.0f;

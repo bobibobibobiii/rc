@@ -120,8 +120,8 @@ void Comm_SendCommData() {
         buscomm->usb_sendBuff[3] = (uint8_t)((len & 0xff00) >> 8);
         buscomm->usb_sendBuff[len] = 0X7A;
         buscomm->usb_sendBuff[len + 1 ] = 0XA7;
-       // Usb_SendBuff(buscomm->usb_sendBuff, 256);
-	   // 	Uart_SendMessageDMA(Const_Communicate_UART_HANDLER, buscomm->usb_sendBuff, len + 2);
+        //Usb_SendBuff(buscomm->usb_sendBuff, 256);
+	    Uart_SendMessageDMA(Const_Communicate_UART_HANDLER, buscomm->usb_sendBuff, len + 2);
         buscomm->state = Comm_STATE_CONNECTED;
 }
 
@@ -155,11 +155,11 @@ void Comm_DecodeData(uint8_t buff[], uint32_t rxdatalen) {
     buscomm->rx_dt = DWT_GetDeltaT(&buscomm->last_rx_tick);
     uint32_t len = 4;
 
-        for (int i = 0; i < Const_Comm_Receive_BUFF_SIZE; i++) {
-            if (CommCmd_Receive[i].bus_func != NULL) {
-                len += CommCmd_Receive[i].bus_func(buscomm->usb_watchBuff + len);
-            }
-        } 
+	for (int i = 0; i < Const_Comm_Receive_BUFF_SIZE; i++) {
+		if (CommCmd_Receive[i].bus_func != NULL) {
+			len += CommCmd_Receive[i].bus_func(buscomm->usb_watchBuff + len);
+		}
+	} 
 }
 
 void Comm_CANCallBack(CAN_HandleTypeDef* phcan, uint32_t stdid, uint8_t rxdata[], uint32_t len) {

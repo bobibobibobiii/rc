@@ -10,13 +10,13 @@
       <TargetName>testa1</TargetName>
       <ToolsetNumber>0x4</ToolsetNumber>
       <ToolsetName>ARM-ADS</ToolsetName>
-      <pCCUsed>6160000::V6.16::ARMCLANG</pCCUsed>
-      <uAC6>1</uAC6>
+      <pCCUsed>5060960::V5.06 update 7 (build 960)::.\ARM_Compiler_5.06u7</pCCUsed>
+      <uAC6>0</uAC6>
       <TargetOption>
         <TargetCommonOption>
           <Device>STM32F427IIHx</Device>
           <Vendor>STMicroelectronics</Vendor>
-          <PackID>Keil.STM32F4xx_DFP.2.17.0</PackID>
+          <PackID>Keil.STM32F4xx_DFP.2.17.1</PackID>
           <PackURL>https://www.keil.com/pack/</PackURL>
           <Cpu>IRAM(0x20000000-0x2002FFFF) IRAM2(0x10000000-0x1000FFFF) IROM(0x8000000-0x81FFFFF) CLOCK(25000000) FPU2 CPUTYPE("Cortex-M4") TZ</Cpu>
           <FlashUtilSpec></FlashUtilSpec>
@@ -186,6 +186,7 @@
             <RvdsVP>2</RvdsVP>
             <RvdsMve>0</RvdsMve>
             <RvdsCdeCp>0</RvdsCdeCp>
+            <nBranchProt>0</nBranchProt>
             <hadIRAM2>1</hadIRAM2>
             <hadIROM2>0</hadIROM2>
             <StupSel>8</StupSel>
@@ -322,13 +323,13 @@
             <PlainCh>0</PlainCh>
             <Ropi>0</Ropi>
             <Rwpi>0</Rwpi>
-            <wLevel>3</wLevel>
+            <wLevel>2</wLevel>
             <uThumb>0</uThumb>
             <uSurpInc>0</uSurpInc>
             <uC99>1</uC99>
             <uGnu>0</uGnu>
             <useXO>0</useXO>
-            <v6Lang>5</v6Lang>
+            <v6Lang>3</v6Lang>
             <v6LangP>3</v6LangP>
             <vShortEn>1</vShortEn>
             <vShortWch>1</vShortWch>
@@ -418,6 +419,11 @@
               <FileType>1</FileType>
               <FilePath>..\Core\Src\Application\app_serve.c</FilePath>
             </File>
+            <File>
+              <FileName>app_rise.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\app_rise.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -437,6 +443,11 @@
               <FileName>module_serve.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\Core\Src\Modules\module_serve.c</FilePath>
+            </File>
+            <File>
+              <FileName>module_rise.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\module_rise.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -477,6 +488,16 @@
               <FileName>util_uart.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\Core\Src\Utility\util_uart.c</FilePath>
+            </File>
+            <File>
+              <FileName>util_vofa.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\util_vofa.c</FilePath>
+            </File>
+            <File>
+              <FileName>util_PIDtune.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\util_PIDtune.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -1455,8 +1476,8 @@
   <RTE>
     <apis/>
     <components>
-      <component Cclass="CMSIS" Cgroup="CORE" Cvendor="ARM" Cversion="5.6.0" condition="ARMv6_7_8-M Device">
-        <package name="CMSIS" schemaVersion="1.7.7" url="http://www.keil.com/pack/" vendor="ARM" version="5.9.0"/>
+      <component Cclass="CMSIS" Cgroup="CORE" Cvendor="ARM" Cversion="5.4.0" condition="ARMv6_7_8-M Device">
+        <package name="CMSIS" schemaVersion="1.3" url="http://www.keil.com/pack/" vendor="ARM" version="5.7.0"/>
         <targetInfos>
           <targetInfo name="testa1"/>
         </targetInfos>

@@ -43,6 +43,7 @@ void Module_ServeHit(void);
 void Module_ServeKeep(void);
 void Module_ServeAnglePIDCal(void);
 void Module_ServeSpdPIDCal(void);
+void Module_ServeClearStateError(void);
 uint8_t Module_ServeIsAngle(void);
 
 #ifdef __cplusplus

@@ -20,7 +20,7 @@ void Serve_Task(const void *argument) {
 		Serve_ModeUpdate();
 		Serve_Control();
 		//Module_ServePIDTest();
-    osDelay(1);
+		osDelay(100);
   }
 }
 

@@ -23,7 +23,7 @@ void Can_ErrorHandler(uint32_t ret) {
         return;
     }
 }
-
+uint8_t Can_RxData[8];
 
 /**
  * @brief        : Initialize can transmitter
@@ -127,7 +127,7 @@ void HAL_CAN_RxFifo1MsgPendingCallback(CAN_HandleTypeDef *phcan) {
  */
 void HAL_CAN_RxFifo0MsgPendingCallback(CAN_HandleTypeDef *phcan) {
     CAN_RxHeaderTypeDef Can_RxHeader;
-    uint8_t Can_RxData[8];
+    // uint8_t Can_RxData[8];
 		/* Get RX message */
     uint32_t ret = HAL_CAN_GetRxMessage(phcan, CAN_RX_FIFO0, &Can_RxHeader, Can_RxData);
     if (ret != HAL_OK) {
