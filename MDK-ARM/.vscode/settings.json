@@ -10,6 +10,7 @@
         "util_pidtune.h": "c",
         "util_vofa.h": "c",
         "app_rise.h": "c",
-        "sys_dwt.h": "c"
+        "sys_dwt.h": "c",
+        "periph_motor.h": "c"
     }
 }

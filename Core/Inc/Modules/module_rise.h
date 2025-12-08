@@ -31,9 +31,7 @@ typedef enum
 	Rise_Jiqiu,
   Rise_Cuoqiu,
   Rise_Taisheng,
-  Rise_Initpose,
   Rise_Stop,
-  Rise_Lift,
 
 }Rise_Ctrl_ModeEnum;
 
@@ -141,6 +139,7 @@ extern Rise_DataTypeDef Rise_Data;
 Rise_DataTypeDef* Rise_GetRisePtr(void);
 void Rise_Init();
 void Rise_Update_Fdb();
+void Rise_Check();
 void Rise_Set_Torque_Output(float torque1,float torque2,float torque3,float torque4, float torque5 );
 void Rise_Set_Angle_Output(float ang1,float ang2,float ang3);   
 void Rise_Set_Speed_Output(float speed1,float speed2,float speed3);                                     

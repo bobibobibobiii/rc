@@ -1,8 +1,8 @@
 /*
  * @Author: error: error: git config user.name & please set dead value or install git && error: git config user.email & please set dead value or install git & please set dead value or install git
  * @Date: 2025-10-31 18:53:16
- * @LastEditors: error: error: git config user.name & please set dead value or install git && error: git config user.email & please set dead value or install git & please set dead value or install git
- * @LastEditTime: 2025-11-23 15:03:19
+ * @LastEditors: WenXin Tan 3086080053@qq.com
+ * @LastEditTime: 2025-12-08 21:41:23
  * @FilePath: \MDK-ARM\module_rise.c
  * @Description: 
  * 
@@ -51,12 +51,12 @@ float Rise_Chop_Target_Speed = 100.0f; // 搓球目标转速
 float Rise_Lift_Target_Speed = 10.0f;  // 抬升目标转速
 
 float pre_spin_time = 0.5f; //预旋转时间
-float lift_time = 3.0f; //抬升时间
-float drop_time = 3.0f; //下落时间
+float lift_time = 2.0f; //抬升时间
+float drop_time = 0.8f; //下落时间
 float hit_action_time = 1.0f; //击打动作时间    
 
-float LIFT_RETURN_KP = 1.0f;  // 归位力度 (值越大回得越快，太大会震荡)
-float LIFT_MAX_RETURN_SPEED = 100.0f; // 限制最大归位速度，防止太快撞到底
+float LIFT_RETURN_KP = 0.02f;  // 归位力度 (值越大回得越快，太大会震荡)
+float LIFT_MAX_RETURN_SPEED = 10.0f; // 限制最大归位速度，防止太快撞到底
 
 /* =================================================================== */
 float torque1, torque2, torque3, torque4, torque5;
@@ -250,7 +250,7 @@ void Rise_Init() {
     Rise->fdb.Chop_right_pitch_speed = -Motor_Rise_Chop_Right_Motor.encoder.speed;
     Rise->fdb.Chop_left_pitch_angle = 0.0f-Motor_Rise_Chop_Left_Motor.encoder.angle;
     Rise->fdb.Chop_left_pitch_speed = -Motor_Rise_Chop_Left_Motor.encoder.speed;
-    Rise->fdb.Lift_pitch_speed = Motor_Rise_Lift_Motor.encoder.standard_speed;
+    Rise->fdb.Lift_pitch_speed = -Motor_Rise_Lift_Motor.encoder.standard_speed;
     float raw_total_angle = Motor_Rise_Lift_Motor.encoder.consequent_angle;
     Rise->fdb.Lift_pitch_angle = raw_total_angle - Rise->lift_zero_offset;
 
@@ -264,6 +264,46 @@ void Rise_Init() {
     Rise->update_dt = DWT_GetDeltaT(&Rise->last_update_tick);
 
  }
+uint16_t watchdog2=0;
+  /**
+  * @brief      Check Rise motors status
+  * @param      NULL
+  * @retval     NULL
+  */
+ void Rise_Check(){ 
+   Rise_DataTypeDef *Rise = Rise_GetPlatformPtr();
+        
+    if(Motor_Rise_Hit_Motor.watchdog>20)
+    {Rise->error_code = 1;}
+
+    if(Motor_Rise_Chop_Front_Motor.watchdog>20)
+                {Rise->error_code = 2;}
+                    
+    if(Motor_Rise_Chop_Right_Motor.watchdog>20)
+                {Rise->error_code = 3;}
+
+    if(Motor_Rise_Chop_Left_Motor.watchdog>20)
+                {Rise->error_code = 4;}
+
+    if(Motor_Rise_Lift_Motor.watchdog>20)
+                {Rise->error_code = 5;}
+                    
+    if(fabsf( Motor_Rise_Lift_Motor.encoder.torque)>20.0f)
+    {
+        watchdog2++;
+    }
+    else
+    {
+        watchdog2=0;
+    }
+    if(watchdog2>20)
+    {
+        Rise->error_code = 6;
+    }
+        
+}
+
+
 float torque;
   /**
   * @brief      Set Rise motors torque output
@@ -422,78 +462,6 @@ void Rise_Set_OutputState(uint8_t state) {
 
 
 
-void Rise_Hit_Cal(){
-    Rise_DataTypeDef *Rise = Rise_GetRisePtr();
-
-    float current_time = DWT_GetTimeline_s();
-
-    static uint8_t g_jiqiu_state = 0; // 状态 0: 空闲, 1: 正在前往45度, 2: 正在返回0度
-    static float g_action_start_time = 0.0f;
-    static uint8_t g_last_rise_mode = Rise_Stop; // 假设默认为 Stop
-
-    float current_chop_target  = Rise->pid.Hit_Ang_PID.ref;  // 读取击打电机的当前目标
-    float current_lift_target = Rise->pid.Lift_Ang_PID.ref; // 读取抬升电机的当前目标
-
-    // --- 关键逻辑：检测“模式进入” ---
-    // 检查：当前模式是不是Jiqiu，并且上一帧的模式 *不是* Jiqiu？
-    if (Rise->ctrl_mode == Rise_Jiqiu && g_last_rise_mode != Rise_Jiqiu)
-    {
-        // 如果是，说明我们 *刚刚进入* Jiqiu 模式
-        // 无论 g_jiqiu_state 之前卡在什么状态，都强制重置为 0
-        g_jiqiu_state = 0;
-    }
-    // 更新“上一帧模式”
-    g_last_rise_mode = Rise->ctrl_mode;
-    // --- 模式检测结束 ---
-    switch (Rise->ctrl_mode) {
-		case Rise_Jiqiu:
-	    Rise_Set_OutputState(Rise_middle);  
-// --- 这是一个非阻塞的状态 ---
-        switch (g_jiqiu_state)
-        {
-            case 0: // 状态 0: 空闲，等待开始 (刚从遥控器触发)
-                Rise_Set_Angle_Output(Rise_Hit_Target_Angle,current_chop_target,current_lift_target);        // 1. 设置目标为 45
-                g_action_start_time = current_time;  // 2. 记录当前时间
-                g_jiqiu_state = 1;                   // 3. 切换到 "保持" 状态
-                break;
-
-            case 1: // 状态 1: 正在前往/保持 45 度
-                // 1. 必须 *持续* 设置目标为 45
-                //    因为PID需要每一轮都运行
-                Rise_Set_Angle_Output(Rise_Hit_Target_Angle,current_chop_target,current_lift_target); 
-
-                // 2. *非阻塞* 检查：时间是否已超过3秒？
-                if (current_time - g_action_start_time >= Rise_Hit_Hold_Time)
-                {
-                    g_action_start_time = current_time; // 3. 3秒到了，设置目标为 0
-                    g_jiqiu_state = 2;           // 4. 切换到 "返回" 状态
-                }
-                break;
-            
-            case 2: // 状态 2: 正在返回 0 度
-                // 1. 必须 *持续* 设置目标为 0
-                Rise_Set_Angle_Output(Rise_Hit_Return_Angle,current_chop_target,current_lift_target); 
-                if (current_time - g_action_start_time >= Rise_Hit_Return_Time) // 使用全局变量
-                {
-                    g_jiqiu_state = 0; 
-                }
-                break;    // 3. 切换到 "保持" 状态
-            default:
-                g_jiqiu_state = 0; // 安全保护
-                break;
-            }
-            break;
-        case Rise_Stop:
-            Rise_Set_OutputState(Rise_middle);
-            Rise_Set_Torque_Output(0,0,0,0,0);
-
-            break;				
-        default:
-
-            break;
-    }
-
-}
 float t5 = 0;
 
 /**
@@ -567,6 +535,54 @@ void Rise_Set_Hybrid_Output(float hit_angle, float chop_speed, float lift_speed)
     // 统一发送
     Rise_Set_Torque_Output(t1, t2, t3, t4, t5);
 }
+// 测试触发开关：置 1 开始测试，测试完会自动停在结束状态
+
+void Rise_Test_Hit_Pure(void) {
+    Rise_DataTypeDef *Rise = Rise_GetRisePtr();
+    float current_time = DWT_GetTimeline_s();
+
+    static uint8_t test_state = 0;
+    static float start_time = 0.0f;
+
+    switch (test_state) {
+        case 0: // [启动]
+            start_time = current_time;
+            test_state = 1;
+            break;
+
+        case 1: // [击打动作]
+            // 参数1: Hit目标角度
+            // 参数2: Chop速度 -> 设为 0.0f
+            // 参数3: Lift速度/力矩 -> 设为 0.0f (电机放松)
+            Rise_Set_Angle_Output(Rise_Hit_Target_Angle, 0.0f, 0.0f);
+
+            // 保持 hit_action_time 时间 (例如 0.2秒)
+            if (current_time - start_time >= hit_action_time) {
+                start_time = current_time; // 重置时间给下一个状态用
+                test_state = 2;
+            }
+            break;
+
+        case 2: // [复位动作]
+            // Hit 回到 0 度 (或者 Rise_Hit_Return_Angle)
+            // 其他电机依然保持 0
+            Rise_Set_Angle_Output(Rise_Hit_Return_Angle, 0.0f, 0.0f);
+
+            // 等待复位完成 (使用你之前定义的 Rise_Hit_Return_Time)
+            if (current_time - start_time >= Rise_Hit_Return_Time) {
+                test_state = 3;
+            }
+            break;
+
+        case 3: // [测试结束]
+            // 全停
+            Rise_Set_Torque_Output(0.0f, 0.0f, 0.0f,0.0f,0.0f);
+            
+            // 这里可以选择自动把 flag 置 0，这样下次要测得手动再置 1
+            // g_test_hit_pure_flag = 0; 
+            break;
+    }
+}
 
 void Rise_Chop_Cal(){
     Rise_DataTypeDef *Rise = Rise_GetRisePtr();     
@@ -576,7 +592,7 @@ void Rise_Chop_Cal(){
 
     Rise_Set_OutputState(Rise_middle);  
     // Rise_Set_Speed_Output(current_hit_target, Rise_Chop_Target_Speed, current_lift_target);
-    Rise_Set_Hybrid_Output(0.0f, Rise_Chop_Target_Speed, 0.0f);
+    Rise_Set_Speed_Output(0.0f, Rise_Chop_Target_Speed, 0.0f);
 
 }
 
@@ -586,7 +602,7 @@ void Rise_Lift_Cal(){
     // float current_lift_target = Rise->pid.Lift_Spd_PID.ref; // 读取抬升电机的当前目标
     Rise_Set_OutputState(Rise_middle);  
     // Rise_Set_Speed_Output(current_lift_target,Rise_Chop_Target_Speed, Rise_Lift_Target_Speed);
-    Rise_Set_Hybrid_Output(0.0f,0.0f,Rise_Lift_Target_Speed);
+    Rise_Set_Speed_Output(0.0f,0.0f,Rise_Lift_Target_Speed);
     // Rise_Set_Torque_Output(0.0f,0.0f,0.0f,0.0f,torque_test);
 }
 
@@ -595,6 +611,7 @@ float current_height;
 uint32_t g_case0_entry_count = 0;
 static uint8_t g_auto_state = 0; // 初始状态 0: 空闲/启动
 float g_auto_start_time = 0.0f;
+float  g_auto_start_height = 0.0f;
 static uint8_t g_last_auto_mode = Rise_Stop; // 假设默认为 Stop
 
 void Rise_Auto_Cal(){
@@ -609,6 +626,7 @@ void Rise_Auto_Cal(){
             g_case0_entry_count++;  
             g_auto_start_time = current_time;
             g_auto_state = 1;
+            g_auto_start_height = Rise->fdb.Lift_pitch_angle; 
             break;
 
         case 1: // 预旋转 (Pre-spin)
@@ -639,11 +657,11 @@ void Rise_Auto_Cal(){
             // --- 设定参数 ---
             float slow_down_zone = 500.0f; // 减速区：距离 0 点 500 个单位时开始减速
             float fixed_down_speed = -10.0f; // 匀速下降的速度 (负数代表向下)
-            float landing_kp = 0.05f;        // 着陆时的柔和度
+            float landing_kp = 0.02f;        // 着陆时的柔和度
 
             // --- 逻辑判断 ---
             
-            if (current_height > slow_down_zone) 
+            if (current_height < g_auto_start_height-slow_down_zone) 
             {
                 // 1. 如果离 0 点还很远 (比如 -7000)，就以固定速度下降
                 // 这样避免了在最高点产生巨大的速度指令
@@ -654,7 +672,7 @@ void Rise_Auto_Cal(){
                 // 2. 如果进入减速区 (比如 -300)，开始 P 控制软着陆
                 // 公式：速度 = 距离 * Kp
                 // (角度 - 0) * Kp = 负数 * Kp = 负速度 (向下)
-                return_speed = (0.0f-current_height) * landing_kp;
+                return_speed = (current_height-g_auto_start_height) * landing_kp;
                 
                 // 增加死区，防止在 0 点抖动
                 if (fabs(current_height) < 10.0f) return_speed = 0.0f;
@@ -673,7 +691,7 @@ void Rise_Auto_Cal(){
         case 4: // 击打 (Hit)
 {
                 // 继续计算归位速度，让它死死锁在 0 点，防止松动
-                float pos_error = 0.0f - Rise->fdb.Lift_pitch_angle; 
+                float pos_error = Rise->fdb.Lift_pitch_angle - g_auto_start_height; 
                 float hold_speed = pos_error * LIFT_RETURN_KP;
                 LimitMaxMin(hold_speed, LIFT_MAX_RETURN_SPEED, -LIFT_MAX_RETURN_SPEED);
 
@@ -691,12 +709,12 @@ void Rise_Auto_Cal(){
             // 动作：Hit 归零 | Chop 停 | Lift 停 (或继续锁零)
             {
                 // 保持抬升机构锁在 0 点 (防止复位震动导致托盘掉下来)
-                float lift_pos_error = 0.0f - Rise->fdb.Lift_pitch_angle ; 
-                float lift_hold_speed = lift_pos_error * 1.0f;
-                LimitMaxMin(lift_hold_speed, 100.0f, -100.0f);
+                float pos_error = Rise->fdb.Lift_pitch_angle - g_auto_start_height; 
+                float hold_speed = pos_error * LIFT_RETURN_KP;
+                LimitMaxMin(hold_speed, LIFT_MAX_RETURN_SPEED, -LIFT_MAX_RETURN_SPEED);
 
                 // 发送：Hit 回 0 度
-                Rise_Set_Hybrid_Output(Rise_Hit_Return_Angle, 0.0f, lift_hold_speed);
+                Rise_Set_Hybrid_Output(Rise_Hit_Return_Angle, 0.0f, hold_speed);
             }
 
             // ！！！ 关键修改：等待复位完成 ！！！
@@ -742,16 +760,7 @@ void Rise_Control() {
         case Rise_Taisheng:
 	      Rise_Set_OutputState(Rise_middle); 
           Rise_Lift_Cal();  
-
             break;				
-        case Rise_Initpose:
-
-        Rise_Set_OutputState(Rise_middle);  
-
-
-            break;
-
-        break;
         case Rise_Stop:
         Rise_Set_OutputState(Rise_stop);
         Rise_Set_Torque_Output(0,0,0,0,0);

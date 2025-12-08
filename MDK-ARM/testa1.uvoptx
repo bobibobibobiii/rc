@@ -164,7 +164,7 @@
           <Type>0</Type>
           <LineNumber>791</LineNumber>
           <EnabledFlag>1</EnabledFlag>
-          <Address>134227082</Address>
+          <Address>134224398</Address>
           <ByteObject>0</ByteObject>
           <HtxType>0</HtxType>
           <ManyObjects>0</ManyObjects>
@@ -347,6 +347,11 @@
           <count>30</count>
           <WinNumber>1</WinNumber>
           <ItemText>drop_time</ItemText>
+        </Ww>
+        <Ww>
+          <count>31</count>
+          <WinNumber>1</WinNumber>
+          <ItemText>g_auto_start_height</ItemText>
         </Ww>
       </WatchWindow1>
       <WatchWindow2>
