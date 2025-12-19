@@ -36,8 +36,8 @@ extern const float Const_PitchPosMotorParam[4][5];
 extern const float Const_PitchSpdMotorParam[4][5];
 
 //@twx Rise
-extern const float Const_HitPosMotorParam[4][5];
-extern const float Const_HitSpdMotorParam[4][5];
+extern float Const_HitPosMotorParam[4][5];
+extern float Const_HitSpdMotorParam[4][5];
 
 extern float Const_ChopPosMotorParam[4][5];
 extern float Const_ChopFrontSpdMotorParam[4][5];

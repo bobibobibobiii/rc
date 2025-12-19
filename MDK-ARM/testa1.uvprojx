@@ -422,7 +422,7 @@
             <File>
               <FileName>app_rise.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\app_rise.c</FilePath>
+              <FilePath>..\Core\Src\Application\app_rise.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -447,7 +447,7 @@
             <File>
               <FileName>module_rise.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\module_rise.c</FilePath>
+              <FilePath>..\Core\Src\Modules\module_rise.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -492,12 +492,12 @@
             <File>
               <FileName>util_vofa.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\util_vofa.c</FilePath>
+              <FilePath>..\Core\Src\Utility\util_vofa.c</FilePath>
             </File>
             <File>
-              <FileName>util_PIDtune.c</FileName>
+              <FileName>util_bluetooth_tune.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\util_PIDtune.c</FilePath>
+              <FilePath>..\Core\Src\Utility\util_bluetooth_tune.c</FilePath>
             </File>
           </Files>
         </Group>

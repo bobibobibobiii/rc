@@ -584,6 +584,7 @@ void DMH3510_encoder_callback(Motor_MotorTypeDef *pmotor, uint8_t rxbuff[], uint
 
     pmotor->type = Motor_TYPE_DMH3510;
     pmotor->update_dt = DWT_GetDeltaT(&pmotor->last_update_tick);
+    pmotor->watchdog = 0;
     
 }
 
@@ -602,11 +603,11 @@ void Go1_encoder_callback(Motor_MotorTypeDef *pmotor, uint8_t rxbuff[], uint32_t
     // Go1 数据格式: 4字节 int32, 单位 rad, 需要转换
     // 公式: (raw_int / 16384.0) * 180.0 (转为度) / 减速比 6.33
     int32_t raw_angle_int = (int32_t)((uint32_t)rxbuff[7] | (uint32_t)rxbuff[8] << 8 | (uint32_t)rxbuff[9] << 16 | (uint32_t)rxbuff[10] << 24);
-    float raw_angle = (float)raw_angle_int * 180.0f / 16384.0f / 6.33f;
+    float raw_angle = (float)raw_angle_int * 180.0f / 16384.0f / 6.33f ;
 
     // 解析速度 (Speed)
     int16_t raw_speed_int = (int16_t)((uint16_t)rxbuff[5] | (uint16_t)rxbuff[6] << 8);
-    float current_speed = (float)raw_speed_int / 128.0f * 3.1415926f / 6.33f; // PI = 3.14...
+    float current_speed = (float)raw_speed_int / 128.0f * 3.1415926f/6.33f ; // PI = 3.14...
 
     // 解析力矩 (Torque)
     int16_t raw_torque_int = (int16_t)((uint16_t)rxbuff[3] | (uint16_t)rxbuff[4] << 8);
@@ -782,6 +783,7 @@ void Dji3508_origin_encoder_callback(Motor_MotorTypeDef* motor, uint8_t* rxdata,
 
 	motor->type = Motor_TYPE_Dji3508_origin;
 	motor->update_dt = DWT_GetDeltaT(&motor->last_update_tick);
+    motor->watchdog = 0;
 
 
 }

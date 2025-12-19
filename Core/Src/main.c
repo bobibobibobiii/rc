@@ -30,7 +30,12 @@
 #include "periph_motor.h"
 #include "util_vofa.h"
 #include "module_rise.h"
-#include "util_PIDtune.h"
+#include "util_bluetooth_tune.h"
+
+// 定义变量
+uint8_t bt_rx_byte;
+char bt_rx_buffer[BT_RX_BUF_SIZE];
+uint8_t bt_rx_idx = 0;
 
 /* USER CODE END Includes */
 
@@ -52,7 +57,7 @@
 /* Private variables ---------------------------------------------------------*/
 
 /* USER CODE BEGIN PV */
-
+volatile uint8_t bt_cmd_received_flag = 0; // 新增标志位
 
 /* USER CODE END PV */
 
@@ -83,7 +88,7 @@ int main(void)
   /* MCU Configuration--------------------------------------------------------*/
 
   /* Reset of all peripherals, Initializes the Flash interface and the Systick. */
-  HAL_Init();
+    HAL_Init();
 
   /* USER CODE BEGIN Init */
 
@@ -109,7 +114,8 @@ int main(void)
   /* USER CODE BEGIN 2 */
 	Init_InitAll();
   // 2. !!! 在这里调用 VOFA 帧初始化 !!!
-  Vofa_Frame_Init();
+  // Vofa_Frame_Init();
+	HAL_UART_Receive_IT(&huart2, &bt_rx_byte, 1);
 	
   // Motor_DM_Basic_Output(&Motor_Rise_Chop_Left_Motors , Motor_Enable);
 	// HAL_Delay(1000);
@@ -128,9 +134,6 @@ int main(void)
   /* USER CODE BEGIN WHILE */
   while (1){
  
-    // Motor_SetMotorOutput(&Motor_Rise_Lift_Motor, 0.5f);  
-    // Motor_SendMotorGroupOutput(&Motor_Rise_Lift_Motors);   // 发送指令
-    // HAL_Delay(20);  // 周期 20ms
 	}
     /* USER CODE END WHILE */
 
@@ -185,6 +188,32 @@ void SystemClock_Config(void)
 }
 
 /* USER CODE BEGIN 4 */
+
+
+// 在 main 初始化中开启中断 (USART3 为例)
+// HAL_UART_Receive_IT(&huart3, &bt_rx_byte, 1);
+
+// 回调函数
+void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart) {
+    if (huart->Instance == USART2) {
+        
+        // 收到结束符
+        if (bt_rx_byte == '#' || bt_rx_byte == '\n') {
+            bt_rx_buffer[bt_rx_idx] = '\0'; // 封口
+            bt_cmd_received_flag = 1;       // ★只举旗，不干活★
+            bt_rx_idx = 0;                  // 游标归零
+        } 
+        else {
+            if (bt_rx_idx < BT_RX_BUF_SIZE - 1) {
+                bt_rx_buffer[bt_rx_idx++] = bt_rx_byte;
+            } else {
+                bt_rx_idx = 0; // 防溢出
+            }
+        }
+        // 重新开启接收（这句不能少）
+        HAL_UART_Receive_IT(&huart2, &bt_rx_byte, 1);
+    }
+}        
 
 
 /* USER CODE END 4 */
