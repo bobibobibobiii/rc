@@ -2,7 +2,7 @@
  * @Author: error: error: git config user.name & please set dead value or install git && error: git config user.email & please set dead value or install git & please set dead value or install git
  * @Date: 2025-10-31 18:53:16
  * @LastEditors: WenXin Tan 3086080053@qq.com
- * @LastEditTime: 2025-12-23 11:14:44
+ * @LastEditTime: 2025-12-23 19:44:53
  * @FilePath: \MDK-ARMd:\Files\xiaobing_origin\xiaobing\Core\Src\Modules\module_rise.c
  * @Description:
  *
@@ -40,10 +40,10 @@ float Rise_K_Sync = 0.0f;
 
 float Rise_Hit_Target_Angle = 35.0f;  // 击打目标角度
 float Rise_Hit_Return_Angle = 0.0f;   // 返回角度
-float Rise_Hit_Target_Speed = 190.0f; // 击打目标速度
+float Rise_Hit_Target_Speed = 25.0f; // 击打目标速度
 float Rise_Hit_Return_Time = 2.0f;    // 归位等待时间 (s)
 float RISE_HIT_ACCEL_LIMIT = 3000.0f; // 击打最大加速度限制
-float RISE_HIT_V_MAX = 190.0f; // 击打制动开始角度
+float RISE_HIT_V_MAX = 30.0f; // 击打最大速度
 
 // --- 搓球电机 (Chop) 参数 ---
 float Rise_Chop_Front_Target_Speed = 100.0f; // 搓球目标转速

@@ -108,7 +108,7 @@ void Remote_RemoteProcess() {
 				break;
         }
         case Remote_SWITCH_MIDDLE: {
-          Platform_Set_ControlMode(Platform_Initpose);	
+          Platform_Set_ControlMode(Platform_Jiefa);	
           //Gimbal_StateSet(Gimbal_auto);
           Chassis_SetControlMode(Chassis_Remote);   
           Chassis_Set_Speed(Chassis_Run, data->remote.ch[2]/660.0f * 3.0f,data->remote.ch[3]/660.0f * 3.0f,-data->remote.ch[0]/660.0f * 3.0f,50); 

@@ -262,7 +262,8 @@ uint16_t Motor_GetMotorOutput(Motor_MotorTypeDef* pmotor) {
 	}
 	
 	else if (pmotor->type == Motor_TYPE_Go1) {
-			ret = (int16_t)(pmotor->output / 6.33f * 256.0f);
+			// ret = (int16_t)(pmotor->output / 6.33f * 256.0f);
+            ret = (int16_t)(pmotor->output * 256.0f);
 			  return (uint16_t)ret;
 			  }
 }
@@ -607,7 +608,7 @@ void Go1_encoder_callback(Motor_MotorTypeDef *pmotor, uint8_t rxbuff[], uint32_t
 
     // 解析速度 (Speed)
     int16_t raw_speed_int = (int16_t)((uint16_t)rxbuff[5] | (uint16_t)rxbuff[6] << 8);
-    float current_speed = (float)raw_speed_int / 128.0f * 3.1415926f/6.33f ; // PI = 3.14...
+    float current_speed = (float)raw_speed_int / 128.0f * 3.1415926f/ 6.33f ; // PI = 3.14...
 
     // 解析力矩 (Torque)
     int16_t raw_torque_int = (int16_t)((uint16_t)rxbuff[3] | (uint16_t)rxbuff[4] << 8);

@@ -180,6 +180,21 @@
           <WinNumber>1</WinNumber>
           <ItemText>\\testa1\../Core/Src/Modules/module_rise.c\Rise_Data.fdb.Lift_pitch_angle</ItemText>
         </Ww>
+        <Ww>
+          <count>4</count>
+          <WinNumber>1</WinNumber>
+          <ItemText>Motor_Pitch_Front_Motor</ItemText>
+        </Ww>
+        <Ww>
+          <count>5</count>
+          <WinNumber>1</WinNumber>
+          <ItemText>Motor_Pitch_Left_Motor</ItemText>
+        </Ww>
+        <Ww>
+          <count>6</count>
+          <WinNumber>1</WinNumber>
+          <ItemText>Motor_Pitch_Right_Motor</ItemText>
+        </Ww>
       </WatchWindow1>
       <WatchWindow2>
         <Ww>

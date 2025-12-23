@@ -43,14 +43,14 @@
     for(;;) {   
 
       Platform_Update_Fdb();
-//			Platform_Check();
-//			if(Platform->error_code == 0){
-//      Platform_Control();	 
-//      }
-//			else{
-//      Platform_Set_Torque_Output(0,0,0);
-//			}
-			Platform_Control();
+			Platform_Check();
+			if(Platform->error_code == 0){
+				Platform_Control();	 
+			}
+			else{
+				Platform_Set_Torque_Output(0,0,0);
+			}
+			// Platform_Control();
 			Platform_Output();
 			    
       osDelay(100);
