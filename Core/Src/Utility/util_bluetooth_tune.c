@@ -40,11 +40,17 @@ extern float pre_spin_time;
 extern float lift_time;
 extern float drop_time;
 extern float hit_action_time;
+extern float Lift_torque_threshold;
+extern float Hit_torque_threshold;
 
 // --- PID 参数数组 (必须在原文件中去掉 const) ---
 extern float Const_HitPosMotorParam[4][5];
 extern float Const_HitSpdMotorParam[4][5];
 extern float Const_LiftSpdMotorParam[4][5];
+extern float Const_ChopLeftSpdMotorParam[4][5];
+extern float Const_ChopRightSpdMotorParam[4][5];
+extern float Const_ChopFrontSpdMotorParam[4][5];
+
 // 如果还需要调搓球PID，请把 Const_Chop... 也 extern 进来
 
 // --- 外部函数引用 ---
@@ -118,6 +124,10 @@ void Bluetooth_Parse_Command(char *cmd_str) {
         hit_action_time = val_f; 
         BT_Log("Hit Time: %.2f s\r\n", val_f); 
     } 
+    else if (sscanf(cmd_str, "T_Pre=%f", &val_f) == 1) { 
+        pre_spin_time = val_f; 
+        BT_Log("Pre Spin Time: %.2f s\r\n", val_f); 
+    } 
     // T_Ret=1.0# -> 归位等待时间
     else if (sscanf(cmd_str, "T_Ret=%f", &val_f) == 1) { 
         Rise_Hit_Return_Time = val_f; 
@@ -126,15 +136,15 @@ void Bluetooth_Parse_Command(char *cmd_str) {
 
     // ================= [3. 搓球 & 抬升 (Chop & Lift)] =================
     // C=100#   -> 搓球速度
-    else if (sscanf(cmd_str, "C=%f", &val_f) == 1) { 
+    else if (sscanf(cmd_str, "CF=%f", &val_f) == 1) { 
         Rise_Chop_Front_Target_Speed = val_f; 
         BT_Log("Chop Front Spd: %.1f\r\n", val_f); 
     }
-    else if (sscanf(cmd_str, "C=%f", &val_f) == 1) { 
+    else if (sscanf(cmd_str, "CR=%f", &val_f) == 1) { 
         Rise_Chop_Right_Target_Speed = val_f; 
         BT_Log("Chop Right Spd: %.1f\r\n", val_f); 
     }
-    else if (sscanf(cmd_str, "C=%f", &val_f) == 1) { 
+    else if (sscanf(cmd_str, "CL=%f", &val_f) == 1) { 
         Rise_Chop_Left_Target_Speed = val_f; 
         BT_Log("Chop Left Spd: %.1f\r\n", val_f); 
     }
@@ -155,6 +165,14 @@ void Bluetooth_Parse_Command(char *cmd_str) {
     else if (sscanf(cmd_str, "Drop_time=%f", &val_f) == 1) { 
         drop_time = val_f; 
         BT_Log("Drop Time: %.4f\r\n", val_f); 
+    }
+    else if (sscanf(cmd_str, "  LTT=%f", &val_f) == 1) { 
+        Lift_torque_threshold = val_f; 
+        BT_Log("Lift Torque Threshold: %.4f\r\n", val_f); 
+    }
+    else if (sscanf(cmd_str, "  HTT=%f", &val_f) == 1) { 
+        Hit_torque_threshold = val_f; 
+        BT_Log("Hit Torque Threshold: %.4f\r\n", val_f); 
     }
 
     // ================= [4. PID 在线调参 (Hit Speed)] =================
@@ -206,6 +224,36 @@ void Bluetooth_Parse_Command(char *cmd_str) {
     else if (sscanf(cmd_str, "LSD=%f", &val_f) == 1) { 
         Const_LiftSpdMotorParam[0][2] = val_f; need_refresh_pid = 1; 
         BT_Log("Lift Spd D: %.5f\r\n", val_f);
+    }
+    // CSP=0.9# -> Chop Left Speed P
+    else if (sscanf(cmd_str, "CLSP=%f", &val_f) == 1) { 
+        Const_ChopLeftSpdMotorParam[0][0] = val_f; need_refresh_pid = 1; 
+        BT_Log("Chop Spd P: %.5f\r\n", val_f);
+    }
+    // CLSD=0.9# -> Chop Left Speed D
+    else if (sscanf(cmd_str, "CLSD=%f", &val_f) == 1) { 
+        Const_ChopLeftSpdMotorParam[0][2] = val_f; need_refresh_pid = 1; 
+        BT_Log("Chop Spd D: %.5f\r\n", val_f);
+    }
+    // CRSP=0.9# -> Chop Right Speed P
+    else if (sscanf(cmd_str, "CRSP=%f", &val_f) == 1) { 
+        Const_ChopRightSpdMotorParam[0][0] = val_f; need_refresh_pid = 1; 
+        BT_Log("Chop Spd P: %.5f\r\n", val_f);
+    }
+    // CRSD=0.9# -> Chop Right Speed D
+    else if (sscanf(cmd_str, "CRSD=%f", &val_f) == 1) { 
+        Const_ChopRightSpdMotorParam[0][2] = val_f; need_refresh_pid = 1; 
+        BT_Log("Chop Spd D: %.5f\r\n", val_f);
+    }
+    // CFSP=0.9# -> Chop Front Speed P
+    else if (sscanf(cmd_str, "CFSP=%f", &val_f) == 1) { 
+        Const_ChopFrontSpdMotorParam[0][0] = val_f; need_refresh_pid = 1; 
+        BT_Log("Chop Spd P: %.5f\r\n", val_f);
+    }
+    // CFSD=0.9# -> Chop Front Speed D
+    else if (sscanf(cmd_str, "CFSD=%f", &val_f) == 1) { 
+        Const_ChopFrontSpdMotorParam[0][2] = val_f; need_refresh_pid = 1; 
+        BT_Log("Chop Spd D: %.5f\r\n", val_f);
     }
 
     // ================= [7. 特殊指令] =================

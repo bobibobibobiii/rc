@@ -2,7 +2,7 @@
  * @Author: error: error: git config user.name & please set dead value or install git && error: git config user.email & please set dead value or install git & please set dead value or install git
  * @Date: 2025-10-31 18:53:16
  * @LastEditors: WenXin Tan 3086080053@qq.com
- * @LastEditTime: 2025-12-19 16:43:05
+ * @LastEditTime: 2025-12-23 11:14:44
  * @FilePath: \MDK-ARMd:\Files\xiaobing_origin\xiaobing\Core\Src\Modules\module_rise.c
  * @Description:
  *
@@ -38,11 +38,12 @@ float Rise_K_Sync = 0.0f;
 
 // --- 击打电机 (Hit) 参数 ---
 
-float Rise_Hit_Target_Angle = 45.0f;  // 击打目标角度
+float Rise_Hit_Target_Angle = 35.0f;  // 击打目标角度
 float Rise_Hit_Return_Angle = 0.0f;   // 返回角度
-float Rise_Hit_Target_Speed = 300.0f; // 击打目标速度
-float Rise_Hit_Return_Time = 5.0f;    // 归位等待时间 (s)
-float RISE_HIT_ACCEL_LIMIT = 5000.0f; // 击打最大加速度限制
+float Rise_Hit_Target_Speed = 190.0f; // 击打目标速度
+float Rise_Hit_Return_Time = 2.0f;    // 归位等待时间 (s)
+float RISE_HIT_ACCEL_LIMIT = 3000.0f; // 击打最大加速度限制
+float RISE_HIT_V_MAX = 190.0f; // 击打制动开始角度
 
 // --- 搓球电机 (Chop) 参数 ---
 float Rise_Chop_Front_Target_Speed = 100.0f; // 搓球目标转速
@@ -56,15 +57,17 @@ float Rise_Lift_Target_Dist = 200.0f; // 想要上升的高度（角度值）
 float Rise_Lift_Kp_Up = 0.05f;        // 上升到位时的柔和度
 
 float pre_spin_time = 0.5f;   // 预旋转时间
-float lift_time = 1.0f;       // 抬升时间
-float drop_time = 0.5f;       // 下落时间
+float lift_time = 0.3f;       // 抬升时间
+float drop_time = 0.7f;       // 下落时间
 float hit_action_time = 2.0f; // 击打动作时间
+float Lift_torque_threshold = 2.0f; // 击打检测阈值
+float Hit_torque_threshold = 2.0f; // 击打检测阈值
 
 float LIFT_RETURN_KP = 0.02f;        // 归位力度 (值越大回得越快，太大会震荡)
 float LIFT_MAX_RETURN_SPEED = 10.0f; // 限制最大归位速度，防止太快撞到底
 
 /* =================================================================== */
-float torque1, torque2, torque3, torque4, torque5;
+float torque_Hit, torque_CF, torque_CR, torque_CL, torque_Lift;
 
 Rise_DataTypeDef Rise_Data;
 /**
@@ -313,6 +316,7 @@ void Rise_Update_Fdb()
     // 零点待标定
     Rise->fdb.Hit_pitch_angle = Motor_Rise_Hit_Motor.encoder.angle;
     Rise->fdb.Hit_pitch_speed = Motor_Rise_Hit_Motor.encoder.speed;
+    Rise->fdb.Hit_pitch_torque = Motor_Rise_Hit_Motor.encoder.torque;
     Rise->fdb.Chop_front_pitch_angle = Motor_Rise_Chop_Front_Motor.encoder.angle;
     Rise->fdb.Chop_front_pitch_speed = Motor_Rise_Chop_Front_Motor.encoder.speed;
     Rise->fdb.Chop_right_pitch_angle = Motor_Rise_Chop_Right_Motor.encoder.angle;
@@ -322,6 +326,7 @@ void Rise_Update_Fdb()
     Rise->fdb.Lift_pitch_speed = Motor_Rise_Lift_Motor.encoder.standard_speed;
     float raw_total_angle = Motor_Rise_Lift_Motor.encoder.consequent_angle;
     Rise->fdb.Lift_pitch_angle = raw_total_angle - Rise->lift_zero_offset;
+    Rise->fdb.Lift_pitch_torque = Motor_Rise_Lift_Motor.encoder.torque;
 
     Motor_Rise_Hit_Motor.watchdog += 1;
     Motor_Rise_Chop_Front_Motor.watchdog += 1;
@@ -380,34 +385,33 @@ void Rise_Check()
     }
 }
 
-float torque;
 /**
  * @brief      Set Rise motors torque output
- * @param      torque1: Hit motor torque
- * @param      torque2: Chop front motor torque
- * @param      torque3: Chop right motor torque
- * @param      torque4: Chop left motor torque
- * @param      torque5: Lift motor torque
+ * @param      torque_Hit: Hit motor torque
+ * @param      torque_CF: Chop front motor torque
+ * @param      torque_CR: Chop right motor torque
+ * @param      torque_CL: Chop left motor torque
+ * @param      torque_Lift: Lift motor torque
  * @retval     NULL
  */
-void Rise_Set_Torque_Output(float torque1, float torque2, float torque3, float torque4, float torque5)
+void Rise_Set_Torque_Output(float torque_Hit, float torque_CF, float torque_CR, float torque_CL, float torque_Lift)
 {
 
-    Motor_SetMotorOutput(&Motor_Rise_Hit_Motor, torque1);
-    Motor_SetMotorOutput(&Motor_Rise_Chop_Front_Motor, torque2);
-    Motor_SetMotorOutput(&Motor_Rise_Chop_Right_Motor, torque3);
-    Motor_SetMotorOutput(&Motor_Rise_Chop_Left_Motor, torque4);
-    Motor_SetMotorOutput(&Motor_Rise_Lift_Motor, -torque5);
+    Motor_SetMotorOutput(&Motor_Rise_Hit_Motor, torque_Hit);
+    Motor_SetMotorOutput(&Motor_Rise_Chop_Front_Motor, torque_CF);
+    Motor_SetMotorOutput(&Motor_Rise_Chop_Right_Motor, torque_CR);
+    Motor_SetMotorOutput(&Motor_Rise_Chop_Left_Motor, torque_CL);
+    Motor_SetMotorOutput(&Motor_Rise_Lift_Motor, -torque_Lift);
 }
 
 void Rise_Set_Angle_Output(float ang1, float ang2, float ang3, float ang4, float ang5)
 {
     Rise_DataTypeDef *Rise = Rise_GetRisePtr();
     // float torque1, torque2, torque3, torque4;
-    LimitMaxMin(ang1, 90.0f, -30.0f);
-    LimitMaxMin(ang2, 280.0f, -280.0f);
-    LimitMaxMin(ang3, 280.0f, -280.0f);
-    LimitMaxMin(ang4, 280.0f, -280.0f);
+    LimitMaxMin(ang1, 180.0f, -30.0f);
+    LimitMaxMin(ang2, 360.0f, -360.0f);
+    LimitMaxMin(ang3, 360.0f, -360.0f);
+    LimitMaxMin(ang4, 360.0f, -360.0f);
     LimitMaxMin(ang5, 360.0f, -360.0f);
 
     switch (Rise->output_state)
@@ -420,14 +424,14 @@ void Rise_Set_Angle_Output(float ang1, float ang2, float ang3, float ang4, float
         PID_SetPIDRef(&Rise->pid.Hit_Spd_PID, PID_GetPIDOutput(&Rise->pid.Hit_Ang_PID));
         PID_SetPIDFdb(&Rise->pid.Hit_Spd_PID, Rise->fdb.Hit_pitch_speed);
         PID_CalcPID(&Rise->pid.Hit_Spd_PID, &Rise->pid.Hit_Spd_Middle_PIDParam);
-        torque1 = PID_GetPIDOutput(&Rise->pid.Hit_Spd_PID) - 0.0f;
+        torque_Hit = PID_GetPIDOutput(&Rise->pid.Hit_Spd_PID) - 0.0f;
 
         float angle = Rise->fdb.Hit_pitch_angle;
         if (angle >= 150.0f)
         {
             // 禁止任何“继续向前”的力矩
-            if (torque1 > 0.0f)
-                torque1 = -10.0f;
+            if (torque_Hit > 0.0f)
+                torque_Hit = -10.0f;
         }
 
         PID_SetPIDRef(&Rise->pid.Chop_Front_Ang_PID, ang2);
@@ -436,7 +440,7 @@ void Rise_Set_Angle_Output(float ang1, float ang2, float ang3, float ang4, float
         PID_SetPIDRef(&Rise->pid.Chop_Front_Spd_PID, PID_GetPIDOutput(&Rise->pid.Chop_Front_Ang_PID));
         PID_SetPIDFdb(&Rise->pid.Chop_Front_Spd_PID, -Motor_Rise_Chop_Front_Motor.encoder.speed);
         PID_CalcPID(&Rise->pid.Chop_Front_Spd_PID, &Rise->pid.Chop_Front_Spd_Middle_PIDParam);
-        torque2 = PID_GetPIDOutput(&Rise->pid.Chop_Front_Spd_PID);
+        torque_CF = PID_GetPIDOutput(&Rise->pid.Chop_Front_Spd_PID);
 
         PID_SetPIDRef(&Rise->pid.Chop_Right_Ang_PID, ang3);
         PID_SetPIDFdb(&Rise->pid.Chop_Right_Ang_PID, Rise->fdb.Chop_right_pitch_angle);
@@ -444,15 +448,15 @@ void Rise_Set_Angle_Output(float ang1, float ang2, float ang3, float ang4, float
         PID_SetPIDRef(&Rise->pid.Chop_Right_Spd_PID, PID_GetPIDOutput(&Rise->pid.Chop_Right_Ang_PID));
         PID_SetPIDFdb(&Rise->pid.Chop_Right_Spd_PID, -Motor_Rise_Chop_Right_Motor.encoder.speed);
         PID_CalcPID(&Rise->pid.Chop_Right_Spd_PID, &Rise->pid.Chop_Right_Spd_Middle_PIDParam);
-        torque3 = PID_GetPIDOutput(&Rise->pid.Chop_Right_Spd_PID);
+        torque_CR = PID_GetPIDOutput(&Rise->pid.Chop_Right_Spd_PID);
 
-        PID_SetPIDRef(&Rise->pid.Lift_Ang_PID, ang4);
-        PID_SetPIDFdb(&Rise->pid.Lift_Ang_PID, Rise->fdb.Lift_pitch_angle);
-        PID_CalcPID(&Rise->pid.Lift_Ang_PID, &Rise->pid.Lift_Ang_Middle_PIDParam);
-        PID_SetPIDRef(&Rise->pid.Lift_Spd_PID, PID_GetPIDOutput(&Rise->pid.Lift_Ang_PID));
-        PID_SetPIDFdb(&Rise->pid.Lift_Spd_PID, -Motor_Rise_Lift_Motor.encoder.speed);
-        PID_CalcPID(&Rise->pid.Lift_Spd_PID, &Rise->pid.Lift_Spd_Middle_PIDParam);
-        torque4 = PID_GetPIDOutput(&Rise->pid.Lift_Spd_PID);
+        PID_SetPIDRef(&Rise->pid.Chop_Left_Ang_PID, ang4);
+        PID_SetPIDFdb(&Rise->pid.Chop_Left_Ang_PID, Rise->fdb.Chop_left_pitch_angle);
+        PID_CalcPID(&Rise->pid.Chop_Left_Ang_PID, &Rise->pid.Chop_Left_Ang_Middle_PIDParam);
+        PID_SetPIDRef(&Rise->pid.Chop_Left_Spd_PID, PID_GetPIDOutput(&Rise->pid.Chop_Left_Ang_PID));
+        PID_SetPIDFdb(&Rise->pid.Chop_Left_Spd_PID, -Motor_Rise_Chop_Left_Motor.encoder.speed);
+        PID_CalcPID(&Rise->pid.Chop_Left_Spd_PID, &Rise->pid.Chop_Left_Spd_Middle_PIDParam);
+        torque_CL = PID_GetPIDOutput(&Rise->pid.Chop_Left_Spd_PID);
 
         PID_SetPIDRef(&Rise->pid.Lift_Ang_PID, ang5);
         PID_SetPIDFdb(&Rise->pid.Lift_Ang_PID, Rise->fdb.Lift_pitch_angle);
@@ -460,13 +464,13 @@ void Rise_Set_Angle_Output(float ang1, float ang2, float ang3, float ang4, float
         PID_SetPIDRef(&Rise->pid.Lift_Spd_PID, PID_GetPIDOutput(&Rise->pid.Lift_Ang_PID));
         PID_SetPIDFdb(&Rise->pid.Lift_Spd_PID, -Motor_Rise_Lift_Motor.encoder.speed);
         PID_CalcPID(&Rise->pid.Lift_Spd_PID, &Rise->pid.Lift_Spd_Middle_PIDParam);
-        torque5 = -PID_GetPIDOutput(&Rise->pid.Lift_Spd_PID) - 0.0f;
+        torque_Lift = -PID_GetPIDOutput(&Rise->pid.Lift_Spd_PID) - 0.0f;
         break;
     default:
         break;
     }
 
-    Rise_Set_Torque_Output(torque1, torque2, torque3, torque4, torque5);
+    Rise_Set_Torque_Output(torque_Hit, torque_CF, torque_CR, torque_CL, torque_Lift);
 }
 
 /**
@@ -480,10 +484,10 @@ void Rise_Set_Speed_Output(float hit_speed, float chop1_speed, float chop2_speed
 {
     Rise_DataTypeDef *Rise = Rise_GetRisePtr();
     // float torque1, torque2, torque3, torque4;
-    LimitMaxMin(hit_speed, 500.0f, -500.0f);
-    LimitMaxMin(chop1_speed, 280.0f, -280.0f);
-    LimitMaxMin(chop2_speed, 280.0f, -280.0f);
-    LimitMaxMin(chop3_speed, 280.0f, -280.0f);
+    LimitMaxMin(hit_speed, RISE_HIT_V_MAX, -RISE_HIT_V_MAX);
+    LimitMaxMin(chop1_speed, 500.0f,  -500.0f);
+    LimitMaxMin(chop2_speed, 500.0f,  -500.0f);
+    LimitMaxMin(chop3_speed, 500.0f,  -500.0f);
     LimitMaxMin(lift_speed, 469.0f, -469.0f);
 
     switch (Rise->output_state)
@@ -494,7 +498,7 @@ void Rise_Set_Speed_Output(float hit_speed, float chop1_speed, float chop2_speed
         PID_SetPIDRef(&Rise->pid.Hit_Spd_PID, hit_speed);
         PID_SetPIDFdb(&Rise->pid.Hit_Spd_PID, Rise->fdb.Hit_pitch_speed);
         PID_CalcPID(&Rise->pid.Hit_Spd_PID, &Rise->pid.Hit_Spd_Middle_PIDParam);
-        torque1 = PID_GetPIDOutput(&Rise->pid.Hit_Spd_PID);
+        torque_Hit = PID_GetPIDOutput(&Rise->pid.Hit_Spd_PID);
 
         // chop的逻辑
 
@@ -510,30 +514,30 @@ void Rise_Set_Speed_Output(float hit_speed, float chop1_speed, float chop2_speed
         // 3. 计算PID
         PID_CalcPID(&Rise->pid.Chop_Front_Spd_PID, &Rise->pid.Chop_Front_Spd_Middle_PIDParam);
         // 4. 获取力矩
-        torque2 = PID_GetPIDOutput(&Rise->pid.Chop_Front_Spd_PID) - (Rise_K_Sync * front_sync_err);
+        torque_CF = PID_GetPIDOutput(&Rise->pid.Chop_Front_Spd_PID) - (Rise_K_Sync * front_sync_err);
 
         // --- Right Motor (ID: 0x02, Group: 9) ---
         PID_SetPIDRef(&Rise->pid.Chop_Right_Spd_PID, chop2_speed);
         PID_SetPIDFdb(&Rise->pid.Chop_Right_Spd_PID, Rise->fdb.Chop_right_pitch_speed);
         PID_CalcPID(&Rise->pid.Chop_Right_Spd_PID, &Rise->pid.Chop_Right_Spd_Middle_PIDParam);
-        torque3 = PID_GetPIDOutput(&Rise->pid.Chop_Right_Spd_PID) - (Rise_K_Sync * right_sync_err);
+        torque_CR = PID_GetPIDOutput(&Rise->pid.Chop_Right_Spd_PID) - (Rise_K_Sync * right_sync_err);
 
         // --- Left Motor (ID: 0x03, Group: 10) ---
         PID_SetPIDRef(&Rise->pid.Chop_Left_Spd_PID, chop3_speed);
         PID_SetPIDFdb(&Rise->pid.Chop_Left_Spd_PID, Rise->fdb.Chop_left_pitch_speed);
         PID_CalcPID(&Rise->pid.Chop_Left_Spd_PID, &Rise->pid.Chop_Left_Spd_Middle_PIDParam);
-        torque4 = PID_GetPIDOutput(&Rise->pid.Chop_Left_Spd_PID) - (Rise_K_Sync * left_sync_err);
+        torque_CL = PID_GetPIDOutput(&Rise->pid.Chop_Left_Spd_PID) - (Rise_K_Sync * left_sync_err);
 
         PID_SetPIDRef(&Rise->pid.Lift_Spd_PID, lift_speed);
         PID_SetPIDFdb(&Rise->pid.Lift_Spd_PID, Rise->fdb.Lift_pitch_speed);
         PID_CalcPID(&Rise->pid.Lift_Spd_PID, &Rise->pid.Lift_Spd_Middle_PIDParam);
-        torque5 = -PID_GetPIDOutput(&Rise->pid.Lift_Spd_PID);
+        torque_Lift = -PID_GetPIDOutput(&Rise->pid.Lift_Spd_PID);
         break;
     default:
         break;
     }
 
-    Rise_Set_Torque_Output(torque1, torque2, torque3, torque4, torque5);
+    Rise_Set_Torque_Output(torque_Hit, torque_CF, torque_CR, torque_CL, torque_Lift);
 }
 
 void Rise_Set_ControlMode(uint8_t mode)
@@ -558,10 +562,10 @@ void Rise_Set_Hybrid_Output(float hit_angle, float chop_front_speed, float chop_
     Rise_DataTypeDef *Rise = Rise_GetRisePtr();
 
     // 1. 限幅
-    LimitMaxMin(hit_angle, 90.0f, -30.0f);
-    LimitMaxMin(chop_front_speed, 280.0f, -280.0f);
-    LimitMaxMin(chop_right_speed, 280.0f, -280.0f);
-    LimitMaxMin(chop_left_speed, 280.0f, -280.0f);
+    LimitMaxMin(hit_angle, 180.0f, -30.0f);
+    LimitMaxMin(chop_front_speed, 500.0f,  -500.0f);
+    LimitMaxMin(chop_right_speed, 500.0f,  -500.0f);
+    LimitMaxMin(chop_left_speed, 500.0f,  -500.0f);
     LimitMaxMin(lift_speed, 469.0f, -469.0f);
 
     // 局部变量
@@ -631,10 +635,10 @@ float Get_Speed_By_Distance(float distance_m)
     float speed = 50.0f * distance_m + 50.0f;
 
     // 限制安全范围
-    if (speed > 600.0f)
-        speed = 600.0f;
-    if (speed < 100.0f)
-        speed = 100.0f;
+    if (speed > RISE_HIT_V_MAX-5.0f)
+        speed = RISE_HIT_V_MAX-5.0f;
+    if (speed < 1.0f)
+        speed = 1.0f;
 
     return speed;
 }
@@ -724,7 +728,7 @@ float Rise_Hit_Control_Variable(float target_angle, float hit_velocity)
     float dt = Rise->update_dt;
     // --- 【修改 1】定义最大允许角度和保护区 ---
     const float ABSOLUTE_MAX_ANGLE = 180.0f; // 机械极限或绝对软限位
-    const float SAFETY_MARGIN = 2.0f;        // 安全余量，防止恰好撞到90度
+    const float SAFETY_MARGIN = 20.0f;        // 安全余量，防止恰好撞到90度
 
     // --- 【修改 2】强制输入限幅 ---
     // 如果上层指令要求去 100 度，这里强制把它改为 88 度 (90-2)
@@ -772,7 +776,7 @@ float Rise_Hit_Control_Variable(float target_angle, float hit_velocity)
     float speed = Rise->fdb.Hit_pitch_speed;
 
     const float HIT_MAX_ANGLE = 150.0f;
-    const float BRAKE_START_ANGLE = 125.0f; // 提前 20° 刹车
+    const float BRAKE_START_ANGLE = 125.0f;
 
     if (angle > BRAKE_START_ANGLE)
     {
@@ -785,17 +789,15 @@ float Rise_Hit_Control_Variable(float target_angle, float hit_velocity)
             spd_ref *= scale;
 
         // 2. 进阶：【主动反向制动】 (Active Braking)
-        // 如果角度超过 82度 且 还在往前冲 (速度 > 50)，直接给反向速度！
-        if (angle > (BRAKE_START_ANGLE - 10) && speed > 50.0f)
+        if (angle > (BRAKE_START_ANGLE - 10) && speed > RISE_HIT_V_MAX - 5.0f)
         {
-            spd_ref = -200.0f; // 猛烈倒车！值越大刹车越狠
+            spd_ref = -(RISE_HIT_V_MAX-10.0f); // 猛烈倒车！值越大刹车越狠
         }
 
         // 3. 救命：【绝对死线】
-        // 如果已经超过 88度，不惜一切代价全力倒车
         if (angle > BRAKE_START_ANGLE)
         {
-            spd_ref = -400.0f;
+            spd_ref = -RISE_HIT_V_MAX;
         }
     }
 
@@ -1012,6 +1014,8 @@ void Rise_Auto_Cal()
 
     case 3: // 等待下落 (Drop)
             // 获取当前高度 (假设上方是负数，例如 -7000; 目标是 0)
+        float current_torque = Rise->fdb.Lift_pitch_torque;
+        static float last_torque = 0.0f;
         current_height = Rise->fdb.Lift_pitch_angle;
         float return_speed = 0.0f;
 
@@ -1021,6 +1025,18 @@ void Rise_Auto_Cal()
         float landing_kp = 0.02f;        // 着陆时的柔和度
 
         // --- 逻辑判断 ---
+
+        // --- 1. 力矩突变检测 (受力停止逻辑) ---
+        // 计算力矩的变化率或偏差
+        float torque_diff = fabs(current_torque - last_torque);
+        last_torque = current_torque; // 更新历史值
+
+        // 如果检测到力矩突然增大（撞击或触底），强制停止
+        if (torque_diff > Lift_torque_threshold && fabs(current_height - g_auto_start_height) > 100.0f)
+        {
+            return_speed = 0.0f;
+            break;
+        }
 
         if (current_height > g_auto_start_height + slow_down_zone)
         {
@@ -1057,17 +1073,13 @@ void Rise_Auto_Cal()
         break;
     case 4: // 击打 (Hit)
     {
+
         // 继续计算归位速度，让它死死锁在 0 点，防止松动
         float pos_error = Rise->fdb.Lift_pitch_angle - g_auto_start_height;
         float hold_speed = -pos_error * LIFT_RETURN_KP;
         LimitMaxMin(hold_speed, LIFT_MAX_RETURN_SPEED, -LIFT_MAX_RETURN_SPEED);
 
         float hit_cmd_speed = Rise_Hit_Control_Variable(Rise_Hit_Target_Angle, Rise_Hit_Target_Speed);
-
-        if (hit_cmd_speed < 0.0f)
-        {
-            hit_cmd_speed = 0.0f;
-        }
 
         // 发送
         Rise_Set_Speed_Output(hit_cmd_speed, Rise_Chop_Front_Target_Speed, Rise_Chop_Right_Target_Speed, Rise_Chop_Left_Target_Speed, hold_speed);
@@ -1121,8 +1133,130 @@ void Rise_Auto_Cal()
         LimitMaxMin(hold_speed, LIFT_MAX_RETURN_SPEED, -LIFT_MAX_RETURN_SPEED);
 
         // 持续发送保持指令 (假设 Lift 是第3个参数)
-        Rise_Set_Hybrid_Output(Rise_Hit_Return_Angle, 0.0f, 0.0f, 0.0f, hold_speed);
+        // Rise_Set_Hybrid_Output(Rise_Hit_Return_Angle, 0.0f, 0.0f, 0.0f, hold_speed);
+        Rise_Set_Torque_Output(0.0f, 0.0f, 0.0f, 0.0f, 0.0f);
         break;
+
+    default:
+        g_auto_state = 0;
+        break;
+    }
+}
+
+void Rise_Without_Hit_Cal()
+{
+    Rise_DataTypeDef *Rise = Rise_GetRisePtr();
+    Rise_Set_OutputState(Rise_middle);
+    current_time = DWT_GetTimeline_s();
+
+    switch (g_auto_state)
+    {
+    case 0: // 启动与初始化
+        Rise_Reset_Hit_Traj();
+        g_hit_finished_flag = 0;
+        g_case0_entry_count++;
+        g_auto_start_time = current_time;
+        g_auto_start_height = Rise->fdb.Lift_pitch_angle;
+        g_auto_state = 1;
+        break;
+
+    case 1: // 预旋转 (Pre-spin)
+        // Hit: 锁在返回角 | Chop: 搓球电机转动 | Lift: 0
+        Rise_Set_Hybrid_Output(Rise_Hit_Return_Angle, Rise_Chop_Front_Target_Speed, 
+                               Rise_Chop_Right_Target_Speed, Rise_Chop_Left_Target_Speed, 0.0f);
+
+        if (current_time - g_auto_start_time >= pre_spin_time)
+        {
+            g_auto_start_time = current_time;
+            g_auto_state = 2;
+        }
+        break;
+
+    case 2: // 抬升 (Lift)
+    {
+        float lift_up_target = g_auto_start_height + Rise_Lift_Target_Dist;
+        float lift_current_pos = Rise->fdb.Lift_pitch_angle;
+        float slow_up_zone = Rise_Lift_Target_Dist * 0.2f;
+        float cmd_speed = 0.0f;
+
+        // 速度规划
+        if (lift_current_pos < (lift_up_target - slow_up_zone))
+        {
+            cmd_speed = Rise_Lift_Target_Speed;
+        }
+        else
+        {
+            cmd_speed = (lift_up_target - lift_current_pos) * Rise_Lift_Kp_Up;
+            if (cmd_speed < 1.0f && cmd_speed > 0.1f) cmd_speed = 1.0f;
+        }
+
+        Rise_Set_Hybrid_Output(Rise_Hit_Return_Angle, Rise_Chop_Front_Target_Speed, 
+                               Rise_Chop_Right_Target_Speed, Rise_Chop_Left_Target_Speed, cmd_speed);
+
+        if (current_time - g_auto_start_time >= lift_time)
+        {
+            g_auto_start_time = current_time;
+            g_auto_state = 3;
+        }
+    }
+    break;
+
+    case 3: // 等待下落 (Drop) + 力矩突变停止
+    {
+        float current_torque = Rise->fdb.Lift_pitch_torque;
+        static float last_torque = 0.0f;
+        current_height = Rise->fdb.Lift_pitch_angle;
+        float return_speed = 0.0f;
+
+        // --- 设定参数 ---
+        float slow_down_zone = 500.0f;   
+        float fixed_down_speed = -10.0f; 
+        float landing_kp = 0.02f;
+
+        // --- 1. 力矩突变检测 ---
+        float torque_diff = fabs(current_torque - last_torque);
+        last_torque = current_torque;
+
+        // 检测受力突变（触底或障碍物）
+        if (torque_diff > Lift_torque_threshold && fabs(current_height - g_auto_start_height) > 100.0f)
+        {
+            return_speed = 0.0f;
+            g_auto_state = 4;
+            break;
+        }
+
+        // --- 2. 软着陆逻辑 ---
+        if (current_height > g_auto_start_height + slow_down_zone)
+        {
+            return_speed = fixed_down_speed;
+        }
+        else
+        {
+            return_speed = -(current_height - g_auto_start_height) * landing_kp;
+            if (fabs(current_height - g_auto_start_height) < 10.0f)
+            {
+                return_speed = 0.0f;
+            }
+        }
+
+        Rise_Set_Hybrid_Output(Rise_Hit_Return_Angle, Rise_Chop_Front_Target_Speed, 
+                               Rise_Chop_Right_Target_Speed, Rise_Chop_Left_Target_Speed, return_speed);
+
+
+    }
+    break;
+
+    case 4: // 完成态 (DONE) - 锁死零点并停止搓球
+    {
+        // 维持在 g_auto_start_height 位置，防止机构因重力下滑
+        float pos_error = Rise->fdb.Lift_pitch_angle - g_auto_start_height;
+        float hold_speed = -pos_error * LIFT_RETURN_KP;
+        LimitMaxMin(hold_speed, LIFT_MAX_RETURN_SPEED, -LIFT_MAX_RETURN_SPEED);
+
+        // 搓球电机设为 0，停止旋转
+        Rise_Set_Torque_Output(0.0f, 0.0f, 0.0f, 0.0f, 0.0f);
+    }
+    break;
 
     default:
         g_auto_state = 0;
@@ -1146,7 +1280,7 @@ void Rise_Control()
         }
 
         // 1.2 如果是从其他模式 -> 切入【自动模式】
-        if (Rise->ctrl_mode == Rise_Auto)
+        if (Rise->ctrl_mode == Rise_Auto || Rise->ctrl_mode == Rise_Without_Hit)
         {
             g_auto_state = 0; // 重置自动状态机
         }
@@ -1174,6 +1308,8 @@ void Rise_Control()
         Rise_Set_OutputState(Rise_stop);
         Rise_Set_Torque_Output(0, 0, 0, 0, 0);
         break;
+    case Rise_Without_Hit:
+        Rise_Without_Hit_Cal();
 
     default:
         break;

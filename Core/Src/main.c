@@ -114,7 +114,7 @@ int main(void)
   /* USER CODE BEGIN 2 */
 	Init_InitAll();
   // 2. !!! 在这里调用 VOFA 帧初始化 !!!
-  // Vofa_Frame_Init();
+  Vofa_Frame_Init();
 	HAL_UART_Receive_IT(&huart2, &bt_rx_byte, 1);
 	
   // Motor_DM_Basic_Output(&Motor_Rise_Chop_Left_Motors , Motor_Enable);

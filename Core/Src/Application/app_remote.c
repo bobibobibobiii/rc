@@ -100,17 +100,18 @@ void Remote_RemoteProcess() {
 	
     switch (data->remote.s[1]) {
         case Remote_SWITCH_UP: {
-			Platform_Set_ControlMode(Platform_Dianqiu);	
-			Gimbal_StateSet(Gimbal_auto);
-			Chassis_SetControlMode(Chassis_Remote);   
-			Chassis_Set_Speed(Chassis_Run, data->remote.ch[2]/660.0f * 3.0f,data->remote.ch[3]/660.0f * 3.0f,-data->remote.ch[0]/660.0f * 3.0f,50); 
+          Platform_Set_ControlMode(Platform_Jiefa);	
+          Platform_Jiefa_Cal(1.0);
+          //  Gimbal_StateSet(Gimbal_auto);
+          // Chassis_SetControlMode(Chassis_Remote);   
+          // Chassis_Set_Speed(Chassis_Run, data->remote.ch[2]/660.0f * 3.0f,data->remote.ch[3]/660.0f * 3.0f,-data->remote.ch[0]/660.0f * 3.0f,50); 
 				break;
         }
         case Remote_SWITCH_MIDDLE: {
-						Platform_Set_ControlMode(Platform_Dianqiu);	
-			//Gimbal_StateSet(Gimbal_auto);
-			Chassis_SetControlMode(Chassis_Remote);   
-			Chassis_Set_Speed(Chassis_Run, data->remote.ch[2]/660.0f * 3.0f,data->remote.ch[3]/660.0f * 3.0f,-data->remote.ch[0]/660.0f * 3.0f,50); 
+          Platform_Set_ControlMode(Platform_Initpose);	
+          //Gimbal_StateSet(Gimbal_auto);
+          Chassis_SetControlMode(Chassis_Remote);   
+          Chassis_Set_Speed(Chassis_Run, data->remote.ch[2]/660.0f * 3.0f,data->remote.ch[3]/660.0f * 3.0f,-data->remote.ch[0]/660.0f * 3.0f,50); 
 	
 //			Platform_Set_ControlMode(Platform_Jiefa);
 //			Chassis_SetControlMode(Chassis_Remote);   

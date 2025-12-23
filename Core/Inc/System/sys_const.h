@@ -7,6 +7,7 @@ extern "C" {
 #include "util_uart.h"
 
 extern const float root3 ;
+extern const float Initial_Z_Position ;
 
 extern const float Const_DIRECTION_LEFT_FRONT_MOTOR_INIT_OFFSET;
 extern const float Const_DIRECTION_RIGHT_FRONT_MOTOR_INIT_OFFSET;

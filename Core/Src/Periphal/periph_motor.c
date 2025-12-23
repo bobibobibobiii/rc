@@ -157,7 +157,7 @@ void Motor_InitAllMotors() {
 
     Motor_groupHandle[7] = &Motor_Rise_Hit_Motors;
     Motor_InitMotorGroup(&Motor_Rise_Hit_Motors, Motor_TYPE_Go1, 1, NULL, &huart6, 0);
-    Motor_InitMotor(&Motor_Rise_Hit_Motor, Motor_TYPE_Go1, 1, 0.1, Go1_encoder_callback,0);
+    Motor_InitMotor(&Motor_Rise_Hit_Motor, Motor_TYPE_Go1, 4, 0.1, Go1_encoder_callback,0);
     Motor_Rise_Hit_Motors.motor_handle[0] = &Motor_Rise_Hit_Motor;
 
     Motor_groupHandle[8] = &Motor_Rise_Chop_Front_Motors;

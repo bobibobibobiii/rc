@@ -2,7 +2,7 @@
  * @Author: error: error: git config user.name & please set dead value or install git && error: git config user.email & please set dead value or install git & please set dead value or install git
  * @Date: 2025-10-31 18:52:29
  * @LastEditors: WenXin Tan 3086080053@qq.com
- * @LastEditTime: 2025-12-19 10:19:49
+ * @LastEditTime: 2025-12-22 23:16:39
  * @FilePath: \MDK-ARMd:\Files\xiaobing_origin\xiaobing\Core\Src\Application\app_rise.c
  * @Description: 
  * 
@@ -60,13 +60,14 @@ extern void Bluetooth_Parse_Command(char *cmd_str);
         }
         // ==========================================
 
-		// Vofa_Send_Data(
-		// Motor_Rise_Chop_Left_Motor.encoder.speed,
-		// Motor_Rise_Chop_Right_Motor.encoder.speed,
-		// Motor_Rise_Chop_Front_Motor.encoder.speed,
-		// Motor_Rise_Lift_Motor.encoder.standard_speed,
-		// Motor_Rise_Hit_Motor.encoder.angle
-        // );
+        Vofa_Send_Data(
+        Motor_Rise_Hit_Motor.encoder.speed,
+        Motor_Rise_Chop_Left_Motor.encoder.speed,
+        Motor_Rise_Chop_Right_Motor.encoder.speed,
+        Motor_Rise_Chop_Front_Motor.encoder.speed,
+        Motor_Rise_Hit_Motor.encoder.angle,
+        Motor_Rise_Hit_Motor.encoder.torque
+        );
 
         Rise_Update_Fdb();
 

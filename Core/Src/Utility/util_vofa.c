@@ -25,8 +25,12 @@ void Vofa_Frame_Init(void)
  * @param ch1 通道1数据 (float)
  * @param ch2 通道2数据 (float)
  * @param ch3 通道3数据 (float)
+ * @param ch4 通道4数据 (float)
+ * @param ch5 通道5数据 (float)
+ * @param ch6 通道6数据 (float)
+ * @param ch7 通道7数据 (float)
  */
-void Vofa_Send_Data(float ch1, float ch2, float ch3, float ch4 , float ch5)
+void Vofa_Send_Data(float ch1, float ch2, float ch3, float ch4 , float ch5, float ch6)
 {
     // 1. (!!! 关键的DMA安全检查 !!!)
     // 检查上一次 DMA 传输是否已经完成
@@ -42,10 +46,11 @@ void Vofa_Send_Data(float ch1, float ch2, float ch3, float ch4 , float ch5)
     g_vofa_frame_buff.fdata[2] = ch3;
     g_vofa_frame_buff.fdata[3] = ch4;
     g_vofa_frame_buff.fdata[4] = ch5;
+    g_vofa_frame_buff.fdata[5] = ch6;
     
     // 帧尾在 Vofa_Frame_Init() 中已填充，此处无需重复填充
 
     // 3. 启动 DMA 传输
     // (注意：您必须用 (uint8_t*) 来发送)
-    HAL_UART_Transmit_DMA(&huart2, (uint8_t*)&g_vofa_frame_buff, sizeof(Frame_t));
+    HAL_UART_Transmit_DMA(&huart7, (uint8_t*)&g_vofa_frame_buff, sizeof(Frame_t));
 }

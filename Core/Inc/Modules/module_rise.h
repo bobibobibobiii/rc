@@ -9,6 +9,7 @@
 
 #ifndef MODULE_RISE_H
 #define MODULE_RISE_H
+#define DEBUG_RISE
 
 #ifdef __cplusplus
 extern "C" {
@@ -32,16 +33,17 @@ typedef enum
   Rise_Cuoqiu,
   Rise_Taisheng,
   Rise_Stop,
+  Rise_Without_Hit,
 
 }Rise_Ctrl_ModeEnum;
 
 typedef struct
 {
-  float Hit_pitch_angle,Hit_pitch_speed;
+  float Hit_pitch_angle,Hit_pitch_speed,Hit_pitch_torque;
   float Chop_front_pitch_angle,Chop_front_pitch_speed ;
   float Chop_right_pitch_angle,Chop_right_pitch_speed;
   float Chop_left_pitch_angle,Chop_left_pitch_speed;
-  float Lift_pitch_angle, Lift_pitch_speed;
+  float Lift_pitch_angle, Lift_pitch_speed,Lift_pitch_torque;
 
 
 }Rise_FeedbackTypeDef;
@@ -150,6 +152,8 @@ void Rise_Output(void);
 void Rise_Chop_Cal();
 void Rise_Hit_Cal();
 float Rise_Hit_Control_Variable(float target_angle, float hit_velocity) ;
+void Rise_Lift_Cal();
+void Rise_Without_Hit_Cal();
 #endif
 
 #ifdef __cplusplus

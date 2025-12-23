@@ -1,6 +1,7 @@
 #include "sys_const.h"
 
 const float root3 = 1.73205;
+const float Initial_Z_Position = 0.12f; // 初始高度位置
 
 const  float Const_DMmotor_P_MIN  = -12.5  ;
 const  float Const_DMmotor_P_MAX   =12.5   ;
@@ -109,7 +110,7 @@ const float Const_PitchSpdMotorParam[4][5] = {
 // 修改思路: 全部除以 6.33
 float Const_HitPosMotorParam[4][5] = {
     //   Kp      Ki      Kd      I_Limit  Out_Limit
-    {0.15f,  0.001f,  1.5f,   120.0f,   15.0f}, 
+    {0.15f,  0.001f,  1.5f,   120.0f,   300.0f}, 
     {0.1f, -1}, {0, 0}, {-1, -1}    
 };
 
@@ -118,7 +119,7 @@ float Const_HitPosMotorParam[4][5] = {
 // 修改思路: Kp 除以 6.33
 float Const_HitSpdMotorParam[4][5] = {
     //   Kp      Ki      Kd      I_Limit  Out_Limit
-    {0.12f,  0.001f,  0.0f,   100.0f,   24.0f},
+    {0.2f,  0.001f,  0.045f,   100.0f,   80.0f},
     {0.1f, -1}, {0, 0}, {-1, -1}    
 };
 
