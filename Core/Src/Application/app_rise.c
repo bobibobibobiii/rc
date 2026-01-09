@@ -2,7 +2,7 @@
  * @Author: error: error: git config user.name & please set dead value or install git && error: git config user.email & please set dead value or install git & please set dead value or install git
  * @Date: 2025-10-31 18:52:29
  * @LastEditors: WenXin Tan 3086080053@qq.com
- * @LastEditTime: 2025-12-22 23:16:39
+ * @LastEditTime: 2025-12-23 21:25:04
  * @FilePath: \MDK-ARMd:\Files\xiaobing_origin\xiaobing\Core\Src\Application\app_rise.c
  * @Description: 
  * 
@@ -33,6 +33,7 @@
 extern volatile uint8_t bt_cmd_received_flag; 
 extern char bt_rx_buffer[];
 extern void Bluetooth_Parse_Command(char *cmd_str);
+extern float burst_ff;
 
 	void Rise_Task(void const * argument) {
 		 Rise_DataTypeDef *Rise = Rise_GetRisePtr();
@@ -64,7 +65,7 @@ extern void Bluetooth_Parse_Command(char *cmd_str);
         Motor_Rise_Hit_Motor.encoder.speed,
         Motor_Rise_Chop_Left_Motor.encoder.speed,
         Motor_Rise_Chop_Right_Motor.encoder.speed,
-        Motor_Rise_Chop_Front_Motor.encoder.speed,
+        burst_ff,
         Motor_Rise_Hit_Motor.encoder.angle,
         Motor_Rise_Hit_Motor.encoder.torque
         );
@@ -78,7 +79,7 @@ extern void Bluetooth_Parse_Command(char *cmd_str);
         else{
             Rise_Set_Torque_Output(0,0,0,0,0);
           }
-		// Rise_Control();	
+		  //Rise_Control();	
 		
 		Rise_Output();
 

@@ -1,8 +1,8 @@
 /*
  * @Author: error: error: git config user.name & please set dead value or install git && error: git config user.email & please set dead value or install git & please set dead value or install git
  * @Date: 2025-05-27 18:52:54
- * @LastEditors: error: error: git config user.name & please set dead value or install git && error: git config user.email & please set dead value or install git & please set dead value or install git
- * @LastEditTime: 2025-10-31 19:09:47
+ * @LastEditors: WenXin Tan 3086080053@qq.com
+ * @LastEditTime: 2025-12-23 21:22:42
  * @FilePath: \MDK-ARMd:\Files\xiaobing_origin\xiaobing\Core\Src\Application\app_platform.c
  * @Description: 
  * 

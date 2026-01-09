@@ -20,9 +20,7 @@ extern float Rise_K_Sync;
 
 // --- 击打电机 (Hit) ---
 extern float Rise_Hit_Target_Angle;
-extern float Rise_Hit_Return_Angle;
 extern float Rise_Hit_Target_Speed;
-extern float Rise_Hit_Return_Time;
 extern float RISE_HIT_ACCEL_LIMIT;
 
 // --- 搓球电机 (Chop) ---
@@ -128,11 +126,7 @@ void Bluetooth_Parse_Command(char *cmd_str) {
         pre_spin_time = val_f; 
         BT_Log("Pre Spin Time: %.2f s\r\n", val_f); 
     } 
-    // T_Ret=1.0# -> 归位等待时间
-    else if (sscanf(cmd_str, "T_Ret=%f", &val_f) == 1) { 
-        Rise_Hit_Return_Time = val_f; 
-        BT_Log("Return Time: %.2f s\r\n", val_f); 
-    }
+
 
     // ================= [3. 搓球 & 抬升 (Chop & Lift)] =================
     // C=100#   -> 搓球速度
@@ -258,10 +252,6 @@ void Bluetooth_Parse_Command(char *cmd_str) {
 
     // ================= [7. 特殊指令] =================
     // TEST# -> 立即触发击球测试
-    else if (strstr(cmd_str, "TEST")) {
-        Rise_Set_ControlMode(Rise_Jiqiu);
-        BT_Log("TEST START!\r\n");
-    }
     // STOP# -> 急停
     else if (strstr(cmd_str, "STOP")) {
         Rise_Set_ControlMode(Rise_Stop);

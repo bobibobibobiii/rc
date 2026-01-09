@@ -263,7 +263,7 @@ uint16_t Motor_GetMotorOutput(Motor_MotorTypeDef* pmotor) {
 	
 	else if (pmotor->type == Motor_TYPE_Go1) {
 			// ret = (int16_t)(pmotor->output / 6.33f * 256.0f);
-            ret = (int16_t)(pmotor->output * 256.0f);
+            ret = (int16_t)(pmotor->output / 6.33f * 256.0f);
 			  return (uint16_t)ret;
 			  }
 }

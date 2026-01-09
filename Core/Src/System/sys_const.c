@@ -105,41 +105,37 @@ const float Const_PitchSpdMotorParam[4][5] = {
 };
 
 //@twx PID Parameters for Rise
-// --- 击打电机 (Hit) 位置环参数 ---
-// 原值: Kp=0.9, Ki=0.01, Kd=10.0
-// 修改思路: 全部除以 6.33
-float Const_HitPosMotorParam[4][5] = {
+
+float Const_HitPosMotorParam[2][4][5] = {
     //   Kp      Ki      Kd      I_Limit  Out_Limit
-    {0.15f,  0.001f,  1.5f,   120.0f,   300.0f}, 
-    {0.1f, -1}, {0, 0}, {-1, -1}    
+    {{0.3f,  0.001f,  0.0f,   20.0f,   27.0f}, {0.1f, -1}, {0, 0}, {-1, -1}},
+	{{0.15f,  0.001f,  1.5f,   20.0f,   27.0f}, {0.1f, -1}, {0, 0}, {-1, -1}}
 };
 
-// --- 击打电机 (Hit) 速度环参数 ---
-// 原值: Kp=0.8, Ki=0.01, Kd=0.0
-// 修改思路: Kp 除以 6.33
-float Const_HitSpdMotorParam[4][5] = {
+
+float Const_HitSpdMotorParam[2][4][5] = {
     //   Kp      Ki      Kd      I_Limit  Out_Limit
-    {0.2f,  0.001f,  0.045f,   100.0f,   80.0f},
-    {0.1f, -1}, {0, 0}, {-1, -1}    
+    {{2.65f,  0.01f,  0.65f,   20.0f,   27.0f}, {0.1f, -1}, {0, 0}, {-1, -1}},
+	{{2.0f,  0.001f,  0.0f,   20.0f,   27.0f}, {0.1f, -1}, {0, 0}, {-1, -1}}  
 };
 
 float Const_ChopPosMotorParam[4][5] = {
-	{0.9f, 0.01f, 10.0f, 120.0f, 15.0f},
+	{0.9f, 0.01f, 10.0f, 280.0f, 24.0f},
 	{0.1f, -1}, {0, 0}, {-1, -1}	
 };
 
 float Const_ChopFrontSpdMotorParam[4][5] = {
-	{0.1f, 0.001f, 0.0f, 100.0f, 24.0f},
+	{0.1f, 0.001f, 0.0f, 280.0f, 24.0f},
 	{0.1f, -1}, {0, 0}, {-1, -1}	
 };
 
 float Const_ChopRightSpdMotorParam[4][5] = {
-	{0.1f, 0.001f, 0.0f, 100.0f, 24.0f},
+	{0.1f, 0.001f, 0.0f, 280.0f, 24.0f},
 	{0.1f, -1}, {0, 0}, {-1, -1}	
 };
 
 float Const_ChopLeftSpdMotorParam[4][5] = {
-	{0.1f, 0.001f, 0.0f, 100.0f, 24.0f},
+	{0.1f, 0.001f, 0.0f, 280.0f, 24.0f},
 	{0.1f, -1}, {0, 0}, {-1, -1}	
 };
 
@@ -149,7 +145,7 @@ float Const_LiftPosMotorParam[4][5] = {
 };
 
 float Const_LiftSpdMotorParam[4][5] = {
-	{0.9f, 0.7f, 0.0f, 2.0f, 10.0f},
+	{0.5f, 0.0f, 0.0f, 2.0f, 10.0f},
 	{0.1f, -1}, {0, 0}, {-1, -1}	
 };
 

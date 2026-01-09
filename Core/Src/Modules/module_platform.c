@@ -106,7 +106,9 @@ void Platform_Init() {
 	Platform->tar.plat_roll = 0;
 
 
-	PID_InitPIDParam(&Platform->pid.Pitch_Ang_Fast_PIDParam,Const_Platform_Pitch_Ang_Param[0][0][0],Const_Platform_Pitch_Ang_Param[0][0][1],Const_Platform_Pitch_Ang_Param[0][0][2],Const_Platform_Pitch_Ang_Param[0][0][3],Const_Platform_Pitch_Ang_Param[0][0][4],
+	PID_InitPIDParam(&Platform->pid.Pitch_Ang_Fast_PIDParam,Const_Platform_Pitch_Ang_Param[0][0][0],Const_Platform_Pitch_Ang_Param[0][0][1],
+                                                            Const_Platform_Pitch_Ang_Param[0][0][2],Const_Platform_Pitch_Ang_Param[0][0][3],
+                                                            Const_Platform_Pitch_Ang_Param[0][0][4],
                                                       		Const_Platform_Pitch_Ang_Param[0][1][0],Const_Platform_Pitch_Ang_Param[0][1][1],
                                                      		Const_Platform_Pitch_Ang_Param[0][2][0],Const_Platform_Pitch_Ang_Param[0][2][1],
                                                       		Const_Platform_Pitch_Ang_Param[0][3][0],Const_Platform_Pitch_Ang_Param[0][3][1],PID_POSITION);

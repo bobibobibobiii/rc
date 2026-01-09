@@ -98,7 +98,7 @@ void Remote_RemoteProcess() {
     Platform_DataTypeDef *Platform = Platform_GetPlatformPtr();
 	Gimbal_TypeDef *gimbal = Gimbal_GetPtr();
 	
-    switch (data->remote.s[1]) {
+    switch (data->remote.s[1]) { 
         case Remote_SWITCH_UP: {
           Platform_Set_ControlMode(Platform_Jiefa);	
           Platform_Jiefa_Cal(1.0);

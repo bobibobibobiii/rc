@@ -9,7 +9,7 @@
 
 #ifndef MODULE_RISE_H
 #define MODULE_RISE_H
-#define DEBUG_RISE
+
 
 #ifdef __cplusplus
 extern "C" {
@@ -29,7 +29,6 @@ typedef enum
 typedef enum
 {
   Rise_Auto=1,
-	Rise_Jiqiu,
   Rise_Cuoqiu,
   Rise_Taisheng,
   Rise_Stop,
@@ -145,13 +144,13 @@ void Rise_Check();
 void Rise_Set_Torque_Output(float torque1,float torque2,float torque3,float torque4, float torque5 );
 void Rise_Set_Angle_Output(float ang1,float ang2,float ang3,float ang4,float ang5) ;   
 void Rise_Set_Speed_Output(float speed1,float speed2,float speed3,float speed4,float speed5);    
-void Rise_Set_Hybrid_Output(float hit_angle, float chop_front_speed, float chop_right_speed, float chop_left_speed, float lift_speed) ;                                 
+void Rise_Set_Hybrid_Output(float hit_angle, float chop_front_speed, float chop_right_speed, float chop_left_speed, float lift_speed) ;   
+void Rise_Set_Hybrid_FF_Output(float target_angle,float extra_torque_ff ,float max_speed_limit,float chop_front_speed, float chop_right_speed, float chop_left_speed, float lift_speed) ;                                     
 void Rise_Set_ControlMode(uint8_t mode) ;
 void Rise_Control(void);
 void Rise_Output(void);
 void Rise_Chop_Cal();
-void Rise_Hit_Cal();
-float Rise_Hit_Control_Variable(float target_angle, float hit_velocity) ;
+float Rise_Hit_Control_Variable(float start_angle, float target_angle, float hit_velocity) ;
 void Rise_Lift_Cal();
 void Rise_Without_Hit_Cal();
 #endif
