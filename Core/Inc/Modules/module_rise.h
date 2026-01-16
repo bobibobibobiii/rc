@@ -33,12 +33,13 @@ typedef enum
   Rise_Taisheng,
   Rise_Stop,
   Rise_Without_Hit,
+  Rise_Hit,
 
 }Rise_Ctrl_ModeEnum;
 
 typedef struct
 {
-  float Hit_pitch_angle,Hit_pitch_speed,Hit_pitch_torque;
+  float Hit_left_angle,Hit_right_angle,Hit_left_speed,Hit_right_speed;
   float Chop_front_pitch_angle,Chop_front_pitch_speed ;
   float Chop_right_pitch_angle,Chop_right_pitch_speed;
   float Chop_left_pitch_angle,Chop_left_pitch_speed;
@@ -49,7 +50,8 @@ typedef struct
 
 typedef struct
 {
-  float Hit_pitch_torque;
+  float Hit_left_torque;
+  float Hit_right_torque;
   float Chop_front_pitch_torque;
   float Chop_right_pitch_torque; 
   float Chop_left_pitch_torque;
@@ -72,25 +74,16 @@ typedef struct
   PID_PIDTypeDef Chop_Left_Ang_PID;
   PID_PIDTypeDef Lift_Ang_PID;
 
-  PID_PIDParamTypeDef Hit_Ang_Fast_PIDParam;
-  PID_PIDParamTypeDef Hit_Ang_Middle_PIDParam;
-  PID_PIDParamTypeDef Hit_Ang_Slow_PIDParam;
+  PID_PIDParamTypeDef Hit_Left_Ang_PIDParam;
+  PID_PIDParamTypeDef Hit_Right_Ang_PIDParam;
 
-  PID_PIDParamTypeDef Chop_Front_Ang_Fast_PIDParam;
   PID_PIDParamTypeDef Chop_Front_Ang_Middle_PIDParam;
-  PID_PIDParamTypeDef Chop_Front_Ang_Slow_PIDParam;
 
-  PID_PIDParamTypeDef Chop_Right_Ang_Fast_PIDParam;
   PID_PIDParamTypeDef Chop_Right_Ang_Middle_PIDParam;
-  PID_PIDParamTypeDef Chop_Right_Ang_Slow_PIDParam;
 
-  PID_PIDParamTypeDef Chop_Left_Ang_Fast_PIDParam;
   PID_PIDParamTypeDef Chop_Left_Ang_Middle_PIDParam;
-  PID_PIDParamTypeDef Chop_Left_Ang_Slow_PIDParam;
 
-  PID_PIDParamTypeDef Lift_Ang_Fast_PIDParam;
   PID_PIDParamTypeDef Lift_Ang_Middle_PIDParam;
-  PID_PIDParamTypeDef Lift_Ang_Slow_PIDParam;
 
   PID_PIDTypeDef Hit_Spd_PID;
   PID_PIDTypeDef Chop_Front_Spd_PID;
@@ -98,25 +91,16 @@ typedef struct
   PID_PIDTypeDef Chop_Left_Spd_PID;
   PID_PIDTypeDef Lift_Spd_PID;
 
-  PID_PIDParamTypeDef Hit_Spd_Fast_PIDParam;
-  PID_PIDParamTypeDef Hit_Spd_Middle_PIDParam;
-  PID_PIDParamTypeDef Hit_Spd_Slow_PIDParam;
+  PID_PIDParamTypeDef Hit_Left_Spd_PIDParam;
+  PID_PIDParamTypeDef Hit_Right_Spd_PIDParam;
 
-  PID_PIDParamTypeDef Chop_Front_Spd_Fast_PIDParam;
   PID_PIDParamTypeDef Chop_Front_Spd_Middle_PIDParam;
-  PID_PIDParamTypeDef Chop_Front_Spd_Slow_PIDParam;
 
-  PID_PIDParamTypeDef Chop_Right_Spd_Fast_PIDParam;
   PID_PIDParamTypeDef Chop_Right_Spd_Middle_PIDParam;
-  PID_PIDParamTypeDef Chop_Right_Spd_Slow_PIDParam; 
 
-  PID_PIDParamTypeDef Chop_Left_Spd_Fast_PIDParam;
-  PID_PIDParamTypeDef Chop_Left_Spd_Middle_PIDParam;
-  PID_PIDParamTypeDef Chop_Left_Spd_Slow_PIDParam;
+  PID_PIDParamTypeDef Chop_Left_Spd_Middle_PIDParam;;
 
-  PID_PIDParamTypeDef Lift_Spd_Fast_PIDParam;
   PID_PIDParamTypeDef Lift_Spd_Middle_PIDParam;
-  PID_PIDParamTypeDef Lift_Spd_Slow_PIDParam;
 
 	
 }Rise_PIDTypeDef;
@@ -141,6 +125,7 @@ Rise_DataTypeDef* Rise_GetRisePtr(void);
 void Rise_Init();
 void Rise_Update_Fdb();
 void Rise_Check();
+void Rise_Set_OutputState(uint8_t state);
 void Rise_Set_Torque_Output(float torque1,float torque2,float torque3,float torque4, float torque5 );
 void Rise_Set_Angle_Output(float ang1,float ang2,float ang3,float ang4,float ang5) ;   
 void Rise_Set_Speed_Output(float speed1,float speed2,float speed3,float speed4,float speed5);    
@@ -150,7 +135,7 @@ void Rise_Set_ControlMode(uint8_t mode) ;
 void Rise_Control(void);
 void Rise_Output(void);
 void Rise_Chop_Cal();
-float Rise_Hit_Control_Variable(float start_angle, float target_angle, float hit_velocity) ;
+// float Rise_Hit_Control_Variable(float start_angle, float target_angle, float hit_velocity) ;
 void Rise_Lift_Cal();
 void Rise_Without_Hit_Cal();
 #endif

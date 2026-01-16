@@ -2,7 +2,7 @@
  * @Author: error: error: git config user.name & please set dead value or install git && error: git config user.email & please set dead value or install git & please set dead value or install git
  * @Date: 2025-10-31 18:52:29
  * @LastEditors: WenXin Tan 3086080053@qq.com
- * @LastEditTime: 2025-12-23 21:25:04
+ * @LastEditTime: 2026-01-16 17:43:17
  * @FilePath: \MDK-ARMd:\Files\xiaobing_origin\xiaobing\Core\Src\Application\app_rise.c
  * @Description: 
  * 
@@ -37,10 +37,10 @@ extern float burst_ff;
 
 	void Rise_Task(void const * argument) {
 		 Rise_DataTypeDef *Rise = Rise_GetRisePtr();
-		osDelay(500);
+		 osDelay(500);
     for(;;) {   
-		// 定义一个计数器
-    	static uint32_t heartbeat_cnt = 0;
+    
+    static uint32_t heartbeat_cnt = 0;
 
 		if (bt_cmd_received_flag == 1) {
           // 这里调用解析函数是安全的
@@ -63,11 +63,11 @@ extern float burst_ff;
 
         Vofa_Send_Data(
         Motor_Rise_Hit_Motor.encoder.speed,
-        Motor_Rise_Chop_Left_Motor.encoder.speed,
-        Motor_Rise_Chop_Right_Motor.encoder.speed,
+        // Motor_Rise_Chop_Left_Motor.encoder.speed,
+        // Motor_Rise_Chop_Right_Motor.encoder.speed,
         burst_ff,
-        Motor_Rise_Hit_Motor.encoder.angle,
-        Motor_Rise_Hit_Motor.encoder.torque
+        Motor_Rise_Hit_Motor.encoder.consequent_angle-265.0f,
+        Motor_Rise_Hit_Motor.encoder.torque 
         );
 
         Rise_Update_Fdb();
@@ -79,9 +79,9 @@ extern float burst_ff;
         else{
             Rise_Set_Torque_Output(0,0,0,0,0);
           }
-		  //Rise_Control();	
+		  // Rise_Control();	
 		
-		Rise_Output();
+		  Rise_Output();
 
 			    
       osDelay(1);

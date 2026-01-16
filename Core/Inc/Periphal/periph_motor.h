@@ -30,7 +30,9 @@ typedef enum
   Motor_Disable, 
   Motor_SaveInitpos,
   Motor_Clearerr 
-} Motor_DMBasicCtrlEnum;
+} Motor_BasicCtrlEnum;
+
+
 
 typedef enum {      
     Motor_TYPE_NOT_CONNECTED    = 0,
@@ -43,7 +45,8 @@ typedef enum {
 	Motor_TYPE_A1               = 7,
 	Motor_TYPE_LK5005		    = 8,
     Motor_TYPE_Go1              = 9,
-    Motor_TYPE_DMH3510          = 10
+    Motor_TYPE_DMH3510          = 10,
+    Motor_TYPE_P1010B          = 11
 } Motor_MotorTypeEnum;
 
 typedef enum {
@@ -76,6 +79,7 @@ typedef struct
 	float   accelerate;
     float   standard_speed;
 	float   limit_angle;
+    float   absolute_angle;
 
 }Motor_EncoderTypeDef;
 
@@ -102,7 +106,7 @@ float velocity;
 float KP;
 float KD;
 float torque;
-Motor_DMBasicCtrlEnum state;
+Motor_BasicCtrlEnum state;
 } Motor_DMMotorTypeDef;
 
 typedef struct {
@@ -157,7 +161,8 @@ extern Motor_MotorTypeDef Motor_Serve_LeftMotor;
 extern Motor_MotorTypeDef Motor_Serve_RightMotor;
 
 //@twx 发球击打板电机
-extern Motor_MotorTypeDef Motor_Rise_Hit_Motor;
+extern Motor_MotorTypeDef Motor_Rise_Hit_LeftMotor;
+extern Motor_MotorTypeDef Motor_Rise_Hit_RightMotor;
 //@twx 发球搓球3电机
 extern Motor_MotorTypeDef Motor_Rise_Chop_Front_Motor;
 extern Motor_MotorTypeDef Motor_Rise_Chop_Left_Motor;
@@ -179,7 +184,7 @@ void Motor_SendMotorGroupsOutput(void);
 uint8_t Motor_IsAnyMotorOffline(void);
 uint8_t Motor_IsMotorOffline(Motor_MotorTypeDef* pmotor);
 
-void Motor_DM_Basic_Output(Motor_MotorGroupTypeDef *pgroup , Motor_DMBasicCtrlEnum basic);
+void Motor_DM_Basic_Output(Motor_MotorGroupTypeDef *pgroup , Motor_BasicCtrlEnum basic);
 void Dji3508_origin_encoder_callback(Motor_MotorTypeDef *pmotor, uint8_t rxbuff[], uint32_t len);
 void Dji3508_xroll_encoder_callback(Motor_MotorTypeDef *pmotor, uint8_t rxbuff[], uint32_t len);
 void Dji6020_encoder_callback(Motor_MotorTypeDef *pmotor, uint8_t rxbuff[], uint32_t len);
@@ -196,8 +201,11 @@ uint16_t crc_ccitt_byte(uint16_t crc, const uint8_t c);
 uint16_t crc_ccitt(uint16_t crc, uint8_t const *buffer, uint32_t len);
 void Motor_SendDMMotorTorqueOutput(Motor_MotorGroupTypeDef *pgroup);
 void Motor_Set_DM_MIT_Output(Motor_MotorGroupTypeDef* pgroup1, float pos1, float vel1, float tor1, float kp,float kd);
-void Motor_DM_Basic_Ctrl(Motor_DMBasicCtrlEnum basic);
+void Motor_DM_Basic_Ctrl(Motor_BasicCtrlEnum basic);
 void Motor_Send_MIT_Output(Motor_MotorGroupTypeDef *pgroup);
+void P1010B_encoder_callback(Motor_MotorTypeDef* motor, uint8_t* rxdata, uint32_t len);
+void Motor_P1010B_Basic_Output(Motor_MotorGroupTypeDef *pgroup,Motor_BasicCtrlEnum basic) ;
+void P1010B_Init_Feedback(Motor_MotorGroupTypeDef *pgroup,uint8_t motor_id);
 
 #endif
 

@@ -147,7 +147,8 @@ void HAL_CAN_RxFifo0MsgPendingCallback(CAN_HandleTypeDef *phcan) {
  */
 void Can_RxMessageCallback(CAN_HandleTypeDef* phcan, CAN_RxHeaderTypeDef* rxheader, uint8_t rxdata[]) {
 // stdid == Motor_groupHandle[i]->motor_handle[j]->id) && phcan != NULL
-    Motor_EncoderDecodeCallback(phcan, NULL,rxheader->StdId, rxdata, rxheader->DLC);
+Motor_EncoderDecodeCallback(phcan, NULL,rxheader->StdId, rxdata, rxheader->DLC);
+
     
 }
 

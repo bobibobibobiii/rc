@@ -2,7 +2,7 @@
  * @Author: error: error: git config user.name & please set dead value or install git && error: git config user.email & please set dead value or install git & please set dead value or install git
  * @Date: 2025-10-31 18:53:16
  * @LastEditors: WenXin Tan 3086080053@qq.com
- * @LastEditTime: 2025-12-28 22:20:39
+ * @LastEditTime: 2026-01-16 22:43:39
  * @FilePath: \MDK-ARMd:\Files\xiaobing_origin\xiaobing\Core\Src\Modules\module_rise.c
  * @Description:
  *
@@ -39,11 +39,12 @@ float Rise_K_Sync = 0.0f;
 // --- 击打电机 (Hit) 参数 ---
 
 float Rise_Hit_Target_Angle = 80.0f;  // 击打目标角度
-float Rise_Hit_Return_Angle = 0.0f;   // 返回角度
-float Rise_Hit_Target_Speed = 15.0f; // 击打目标速度
+float Rise_Hit_Return_Angle = -45.0f;   // 返回角度
+float Rise_Hit_Target_Speed = 18.0f; // 击打目标速度
 float RISE_HIT_ACCEL_LIMIT = 5000.0f; // 击打最大加速度限制
-float RISE_HIT_V_MAX = 30.0f; // 击打最大速度
-float REAL_HIT_ANGLE = 50.0f;
+float RISE_HIT_V_MAX = 20.0f; // 击打最大速度
+float REAL_HIT_ANGLE = 70.0f;
+float HIT_INIT_ANGLE = 0.0f;
 
 // --- 搓球电机 (Chop) 参数 ---
 float Rise_Chop_Front_Target_Speed = 95.0f; // 搓球目标转速
@@ -69,14 +70,12 @@ float LIFT_RETURN_KP = 0.02f;        // 归位力度 (值越大回得越快，�
 float LIFT_MAX_RETURN_SPEED = 10.0f; // 限制最大归位速度，防止太快撞到底
 
 
-float Rise_Gravity_Comp_Max_Current = 0.9f; // 实验测得水平时保持不掉所需的力矩值
+float Rise_Gravity_Comp_Max_Current = 2.0f; // 实验测得水平时保持不掉所需的力矩值
 float Rise_Zero_Angle_Offset = 0.0f; // 如果你的0度不是水平位置，需要补偿
 
 // --- 阻抗控制参数 ---
-// float Rise_Imp_Kp_Approach = 2.0f;   // 接近时的刚度 (弹簧硬度)
-// float Rise_Imp_Kd_Approach = 0.01f;  // 接近时的阻尼 (防止震荡)
 float Rise_Imp_FF_Hit      = 20.0f;  // 击球时的额外爆发力矩
-float Rise_Hit_Zone_Width  = 30.0f;  // 击球区宽度
+float Rise_Hit_Zone_Width  = 90.0f;  // 击球区宽度
 
 /* =================================================================== */
 float torque_Hit, torque_CF, torque_CR, torque_CL, torque_Lift;
@@ -98,68 +97,68 @@ void Rise_Init()
 
     Rise->output_state = Rise_middle;
     Rise->ctrl_mode = Rise_Stop;
-    Rise->fdb.Hit_pitch_angle = 0;
 
     Motor_DM_Basic_Output(&Motor_Rise_Chop_Front_Motors, Motor_Enable);
     Motor_DM_Basic_Output(&Motor_Rise_Chop_Right_Motors, Motor_Enable);
     Motor_DM_Basic_Output(&Motor_Rise_Chop_Left_Motors, Motor_Enable);
 
+
     Rise->lift_zero_offset = Motor_Rise_Lift_Motor.encoder.consequent_angle;
 
-    PID_InitPIDParam(&Rise->pid.Hit_Ang_Fast_PIDParam,
-                     Const_HitPosMotorParam[0][0][0],
-                     Const_HitPosMotorParam[0][0][1],
-                     Const_HitPosMotorParam[0][0][2],
-                     Const_HitPosMotorParam[0][0][3],
-                     Const_HitPosMotorParam[0][0][4],
-                     Const_HitPosMotorParam[0][1][0],
-                     Const_HitPosMotorParam[0][1][1],
-                     Const_HitPosMotorParam[0][2][0],
-                     Const_HitPosMotorParam[0][2][1],
-                     Const_HitPosMotorParam[0][3][0],
-                     Const_HitPosMotorParam[0][3][1],
+    PID_InitPIDParam(&Rise->pid.Hit_Left_Ang_PIDParam,
+                     Const_HitLeftPosMotorParam[0][0],
+                     Const_HitLeftPosMotorParam[0][1],
+                     Const_HitLeftPosMotorParam[0][2],
+                     Const_HitLeftPosMotorParam[0][3],
+                     Const_HitLeftPosMotorParam[0][4],
+                     Const_HitLeftPosMotorParam[1][0],
+                     Const_HitLeftPosMotorParam[1][1],
+                     Const_HitLeftPosMotorParam[2][0],
+                     Const_HitLeftPosMotorParam[2][1],
+                     Const_HitLeftPosMotorParam[3][0],
+                     Const_HitLeftPosMotorParam[3][1],
                      PID_POSITION);
 
-    PID_InitPIDParam(&Rise->pid.Hit_Spd_Fast_PIDParam,
-                     Const_HitSpdMotorParam[0][0][0],
-                     Const_HitSpdMotorParam[0][0][1],
-                     Const_HitSpdMotorParam[0][0][2],
-                     Const_HitSpdMotorParam[0][0][3],
-                     Const_HitSpdMotorParam[0][0][4],
-                     Const_HitSpdMotorParam[0][1][0],
-                     Const_HitSpdMotorParam[0][1][1],
-                     Const_HitSpdMotorParam[0][2][0],
-                     Const_HitSpdMotorParam[0][2][1],
-                     Const_HitSpdMotorParam[0][3][0],
-                     Const_HitSpdMotorParam[0][3][1],
+    PID_InitPIDParam(&Rise->pid.Hit_Left_Spd_PIDParam,
+                     Const_HitLeftSpdMotorParam[0][0],
+                     Const_HitLeftSpdMotorParam[0][1],
+                     Const_HitLeftSpdMotorParam[0][2],
+                     Const_HitLeftSpdMotorParam[0][3],
+                     Const_HitLeftSpdMotorParam[0][4],
+                     Const_HitLeftSpdMotorParam[1][0],
+                     Const_HitLeftSpdMotorParam[1][1],
+                     Const_HitLeftSpdMotorParam[2][0],
+                     Const_HitLeftSpdMotorParam[2][1],
+                     Const_HitLeftSpdMotorParam[3][0],
+                     Const_HitLeftSpdMotorParam[3][1],
                      PID_POSITION);
 
-    PID_InitPIDParam(&Rise->pid.Hit_Ang_Middle_PIDParam,
-                     Const_HitPosMotorParam[1][0][0],
-                     Const_HitPosMotorParam[1][0][1],
-                     Const_HitPosMotorParam[1][0][2],
-                     Const_HitPosMotorParam[1][0][3],
-                     Const_HitPosMotorParam[1][0][4],
-                     Const_HitPosMotorParam[1][1][0],
-                     Const_HitPosMotorParam[1][1][1],
-                     Const_HitPosMotorParam[1][2][0],
-                     Const_HitPosMotorParam[1][2][1],
-                     Const_HitPosMotorParam[1][3][0],
-                     Const_HitPosMotorParam[1][3][1],
+    PID_InitPIDParam(&Rise->pid.Hit_Right_Ang_PIDParam,
+                     Const_HitRightPosMotorParam[0][0],
+                     Const_HitRightPosMotorParam[0][1],
+                     Const_HitRightPosMotorParam[0][2],
+                     Const_HitRightPosMotorParam[0][3],
+                     Const_HitRightPosMotorParam[0][4],
+                     Const_HitRightPosMotorParam[1][0],
+                     Const_HitRightPosMotorParam[1][1],
+                     Const_HitRightPosMotorParam[2][0],
+                     Const_HitRightPosMotorParam[2][1],
+                     Const_HitRightPosMotorParam[3][0],
+                     Const_HitRightPosMotorParam[3][1],
                      PID_POSITION);
 
-    PID_InitPIDParam(&Rise->pid.Hit_Spd_Middle_PIDParam,
-                     Const_HitSpdMotorParam[1][0][0],
-                     Const_HitSpdMotorParam[1][0][1],
-                     Const_HitSpdMotorParam[1][0][2],
-                     Const_HitSpdMotorParam[1][0][3],
-                     Const_HitSpdMotorParam[1][0][4],
-                     Const_HitSpdMotorParam[1][1][0],
-                     Const_HitSpdMotorParam[1][1][1],
-                     Const_HitSpdMotorParam[1][2][0],
-                     Const_HitSpdMotorParam[1][2][1],
-                     Const_HitSpdMotorParam[1][3][0],
-                     Const_HitSpdMotorParam[1][3][1],
+    PID_InitPIDParam(&Rise->pid.Hit_Right_Spd_PIDParam,
+                     Const_HitRightSpdMotorParam[0][0],
+                     Const_HitRightSpdMotorParam[0][1],
+                     Const_HitRightSpdMotorParam[0][2],
+                     Const_HitRightSpdMotorParam[0][3],
+                     Const_HitRightSpdMotorParam[0][4],
+                     Const_HitRightSpdMotorParam[1][0],
+                     Const_HitRightSpdMotorParam[1][1],
+                     Const_HitRightSpdMotorParam[2][0],
+                     Const_HitRightSpdMotorParam[2][1],
+                     Const_HitRightSpdMotorParam[3][0],
+                     Const_HitRightSpdMotorParam[3][1],
                      PID_POSITION);
 
     PID_InitPIDParam(&Rise->pid.Chop_Front_Ang_Middle_PIDParam,
@@ -275,31 +274,6 @@ void Rise_Init()
     Rise->error_code = 0;
 }
 
-void Rise_Refresh_PID_Params(void)
-{
-    Rise_DataTypeDef *Rise = Rise_GetRisePtr();
-
-    // --- 1. 刷新击打电机 (Hit) ---
-    // 位置环 Hit Pos (只刷 P, D)
-    Rise->pid.Hit_Ang_Middle_PIDParam.kp = Const_HitPosMotorParam[1][0][0];
-    Rise->pid.Hit_Ang_Middle_PIDParam.ki = Const_HitPosMotorParam[1][0][1]; // 如果你没给位置环调I，这行也可以注释
-    Rise->pid.Hit_Ang_Middle_PIDParam.kd = Const_HitPosMotorParam[1][0][2];
-
-    // 速度环 Hit Spd (刷 P, I, D)[1]
-    Rise->pid.Hit_Spd_Middle_PIDParam.kp = Const_HitSpdMotorParam[1][0][0];
-    Rise->pid.Hit_Spd_Middle_PIDParam.ki = Const_HitSpdMotorParam[1][0][1];
-    Rise->pid.Hit_Spd_Middle_PIDParam.kd = Const_HitSpdMotorParam[1][0][2];
-
-    // 【这里也删掉了】
-
-    // --- 2. 刷新抬升电机 (Lift) ---
-    // 速度环 Lift Spd (只刷 P)
-    Rise->pid.Lift_Spd_Middle_PIDParam.kp = Const_LiftSpdMotorParam[0][0];
-    Rise->pid.Lift_Spd_Middle_PIDParam.ki = Const_LiftSpdMotorParam[0][1];
-    Rise->pid.Lift_Spd_Middle_PIDParam.kd = Const_LiftSpdMotorParam[0][2];
-
-    // 其他的都不动，保持原样
-}
 /**
  * @brief 清空 PID 状态（用于模式切换时消除历史影响）
  * @param pid 指向 PID 结构体的指针
@@ -334,20 +308,6 @@ void PID_Clear(PID_PIDTypeDef *pid)
 
     // 6. 清空调试变量
     pid->err_watch = 0.0f;
-
-    // 7. 清空滤波器状态
-    // 注意：不要使用 memset 清空整个 Filter 结构体，因为里面可能包含滤波系数(fc, dt等)
-    // 只需要清空输出值和历史值即可。
-    // (假设你的 Filter_LowPassTypeDef 结构体里存储输出的变量叫 out 或 output，请根据实际情况修改)
-
-    // 示例：假设滤波器结构体里有一个 float out;
-    // pid->d_fil.out = 0.0f;
-    // pid->delta_fil.out = 0.0f;
-    // pid->kf1_fil.out = 0.0f;
-    // pid->kf2_fil.out = 0.0f;
-
-    // 如果你的滤波器有 Reset 函数，最好调用它，例如：
-    // Filter_Reset(&pid->d_fil);
 }
 
 void Rise_Update_Fdb()
@@ -355,9 +315,10 @@ void Rise_Update_Fdb()
     Rise_DataTypeDef *Rise = Rise_GetRisePtr();
 
     // 零点待标定
-    Rise->fdb.Hit_pitch_angle = Motor_Rise_Hit_Motor.encoder.angle;
-    Rise->fdb.Hit_pitch_speed = Motor_Rise_Hit_Motor.encoder.speed;
-    Rise->fdb.Hit_pitch_torque = Motor_Rise_Hit_Motor.encoder.torque;
+    Rise->fdb.Hit_left_angle = Motor_Rise_Hit_Motor.encoder.consequent_angle-0.0;//标记竖直向下的位置为0点
+    Rise->fdb.Hit_left_speed = Motor_Rise_Hit_Motor.encoder.standard_speed;
+    Rise->fdb.Hit_right_angle = Motor_Rise_Hit_Motor.encoder.consequent_angle-0.0;//标记竖直向下的位置为0点
+    Rise->fdb.Hit_right_speed = Motor_Rise_Hit_Motor.encoder.standard_speed;
     Rise->fdb.Chop_front_pitch_angle = Motor_Rise_Chop_Front_Motor.encoder.angle;
     Rise->fdb.Chop_front_pitch_speed = Motor_Rise_Chop_Front_Motor.encoder.speed;
     Rise->fdb.Chop_right_pitch_angle = Motor_Rise_Chop_Right_Motor.encoder.angle;
@@ -387,29 +348,34 @@ void Rise_Check()
 {
     Rise_DataTypeDef *Rise = Rise_GetRisePtr();
 
-    if (Motor_Rise_Hit_Motor.watchdog > 20)
+    if (Motor_Rise_Hit_LeftMotor.watchdog > 20)
     {
         Rise->error_code = 1;
     }
 
-    if (Motor_Rise_Chop_Front_Motor.watchdog > 20)
+    if (Motor_Rise_Hit_RightMotor.watchdog > 20)
     {
         Rise->error_code = 2;
     }
 
-    if (Motor_Rise_Chop_Right_Motor.watchdog > 20)
+    if (Motor_Rise_Chop_Front_Motor.watchdog > 20)
     {
         Rise->error_code = 3;
     }
 
-    if (Motor_Rise_Chop_Left_Motor.watchdog > 20)
+    if (Motor_Rise_Chop_Right_Motor.watchdog > 20)
     {
         Rise->error_code = 4;
     }
 
-    if (Motor_Rise_Lift_Motor.watchdog > 20)
+    if (Motor_Rise_Chop_Left_Motor.watchdog > 20)
     {
         Rise->error_code = 5;
+    }
+
+    if (Motor_Rise_Lift_Motor.watchdog > 20)
+    {
+        Rise->error_code = 6;
     }
 
     if (fabsf(Motor_Rise_Lift_Motor.encoder.torque) > 20.0f)
@@ -422,7 +388,112 @@ void Rise_Check()
     }
     if (watchdog_rise2 > 20)
     {
-        Rise->error_code = 6;
+        Rise->error_code = 7;
+    }
+}
+
+// --- 上电回零相关参数 ---
+uint8_t g_system_homed = 0;         // 全局标志：0=未回零，1=已回零
+static uint8_t homing_state = 0; 
+static float homing_start_time = 0; // 超时计时
+
+// 回零参数配置
+const float Homing_Timeout = 8.0f;    // 超时保护 (秒)
+
+/**
+ * @brief 上电自动回零主循环 (非阻塞)
+ */
+void Rise_Homing_Loop(float hit_init_pos)
+{
+    Rise_DataTypeDef *Rise = Rise_GetRisePtr();
+    float current_time = DWT_GetTimeline_s();
+    static uint8_t stable_count = 0; // 防抖计数器
+    
+    static float traj_cmd_pos = 0.0f; // 轨迹指令 (原 curr_angle)
+    static float final_target = 0.0f; // 锁定终点
+
+    // 强制输出状态为 Middle
+    Rise_Set_OutputState(Rise_middle);
+
+    switch (homing_state)
+    {
+    case 0: // --- 初始化 ---
+    {
+        // 等待解包函数运行
+
+        // 1. 获取当前真实位置作为起点
+        traj_cmd_pos = Rise->fdb.Hit_pitch_angle; 
+        
+        // 2. 计算最短路径
+        float diff = hit_init_pos - traj_cmd_pos;
+        
+        float err = fmodf(diff, 360.0f); 
+        
+        // 标准化到 -180 ~ +180
+        if (err > 180.0f) err -= 360.0f;
+        if (err < -180.0f) err += 360.0f;
+
+        // 3. 锁定最终目标
+        final_target = traj_cmd_pos + err;
+
+        homing_start_time = current_time;
+        homing_state = 1;
+        stable_count = 0;
+        break;
+    }
+
+    case 1: // --- 移动归零 ---
+    {
+        float return_step = 0.3f; // 建议改小一点，0.5 对应 500度/秒，可能太快
+
+        // 1. 轨迹生成 (Ramping)
+        // 让 traj_cmd_pos 慢慢接近 final_target
+        if (traj_cmd_pos < final_target - return_step) {
+            traj_cmd_pos += return_step; 
+        } 
+        else if (traj_cmd_pos > final_target + return_step) {
+            traj_cmd_pos -= return_step; 
+        } 
+        else {
+            traj_cmd_pos = final_target; // 锁死
+        }
+
+        // 2. 发送指令
+        Rise_Set_Hybrid_Output(traj_cmd_pos, 0.0f, 0.0f, 0.0f, 0.0f);
+
+        // 3. 判断到位
+        // 必须比较：【真实反馈值】 <-> 【锁定终点】
+        // 这里的 < 0.2f 是允许误差
+        if (Rise->fdb.Hit_pitch_angle - final_target < 0.2f && Rise->fdb.Hit_pitch_angle - final_target >= 0.0f && 
+            fabsf(Rise->fdb.Hit_pitch_speed) < 0.2f)
+        {
+            stable_count++;
+            if (stable_count > 50) // 持续 50ms 稳定
+            {
+                homing_state = 2; 
+            }
+        }
+        else
+        {
+            stable_count = 0;
+        }
+
+        // 4. 超时保护
+        if (current_time - homing_start_time > Homing_Timeout)
+        {
+            Rise->error_code = 7; 
+            homing_state = 2; 
+        }
+        break;
+    }
+
+    case 2: // --- 完成 ---
+    {
+        g_system_homed = 1; // 标记完成
+        
+        Rise->ctrl_mode = Rise_Stop; 
+        break;
+    }
     }
 }
 
@@ -436,9 +507,33 @@ void Rise_Check()
  * @retval     NULL
  */
 // 
+float KICK_TORQUE_VAL=2.0f;  // 踹这一脚的力度 (比如 PID 给 30, 这里加 20, 总共 50)
+#define KICK_SPEED_THRES   0.5f   // 速度低于多少认为“没动” (rad/s)
+#define CMD_DEAD_ZONE      0.1f   // 上层指令死区 (防止微小噪音触发)
 void Rise_Set_Torque_Output(float torque_Hit, float torque_CF, float torque_CR, float torque_CL, float torque_Lift)
 {
     Rise_DataTypeDef *Rise = Rise_GetRisePtr();
+
+        //脉冲启动
+        float curr_speed = Rise->fdb.Hit_pitch_speed; // 获取当前真实速度
+
+        // 1. 判断是否需要介入
+        // 条件A: 上层给的力气大于死区 (说明想动)
+        // 条件B: 实际速度非常小 (说明被静摩擦锁住了)
+        if (fabsf(torque_Hit) > CMD_DEAD_ZONE && fabsf(curr_speed) < KICK_SPEED_THRES)
+        {
+            // 2. 根据方向施加“踹力”
+            if (torque_Hit > 0) 
+            {
+                // 正向指令 -> 正向踹
+                torque_Hit += KICK_TORQUE_VAL;
+            }
+            else 
+            {
+                // 负向指令 -> 负向踹 (让负值更负)
+                torque_Hit -= KICK_TORQUE_VAL;
+            }
+    }
 
         // =======================
         // ⚖️ 新增：重力补偿逻辑
@@ -770,7 +865,7 @@ void Rise_Set_Hybrid_FF_Output(float target_angle,float extra_torque_ff ,float m
 
         // 判断是否处于“强力击打模式”
         // 依据：如果前馈力矩很大（比如超过 5.0），说明我们在梯形的平顶区或爬升区
-        if (fabsf(extra_torque_ff) > 5.0f) 
+        if (fabsf(extra_torque_ff) > 3.0f) 
         {
             // 【纯开环模式】
             // 直接输出前馈，完全无视 PID
@@ -829,120 +924,33 @@ void Rise_Set_Hybrid_FF_Output(float target_angle,float extra_torque_ff ,float m
 }
 
 
-// 定义全局或静态变量来保存轨迹状态
-static float hit_traj_pos = 0.0f;
-static float hit_traj_vel = 0.0f;
-static uint8_t hit_traj_init = 0; // 初始化标志
 
-void Rise_Reset_Hit_Traj(void)
-{
-    hit_traj_init = 0;
-    hit_traj_pos = 0.0f;
-    hit_traj_vel = 0.0f;
-}
 
+// 定义静态变量，记录状态和时间 (这样函数退出后变量还在)
+static uint32_t last_toggle_time = 0;
+static uint8_t target_state = 0; // 0:去90度, 1:回0度
 int g_hit_finished_flag = 0;
-/**
- * @brief      变力度击打控制
- * @param      target_angle   击球点的角度 (例如 45度)
- * @param      hit_velocity   击打力度 (例如 300 deg/s)
- */
-float Rise_Hit_Control_Variable(float start_angle, float target_angle, float hit_target_speed)
+
+void Rise_Hit_Cal()
 {
-    Rise_DataTypeDef *Rise = Rise_GetRisePtr();
-    float dt = Rise->update_dt;
-    // --- 【修改 1】定义最大允许角度和保护区 ---
-    const float ABSOLUTE_MAX_ANGLE = 180.0f; // 机械极限或绝对软限位
-    const float SAFETY_MARGIN = 40.0f;        // 安全余量，防止恰好撞到90度
-   
-    // --- 强制输入限幅 ---
-    if (target_angle > (ABSOLUTE_MAX_ANGLE - SAFETY_MARGIN))
+    // 1. 获取当前时间 (单位: 毫秒)
+    uint32_t now = HAL_GetTick(); 
+
+    // 2. 判断时间是否到了切换的时候 (例如每 1000ms 切换一次)
+    if (now - last_toggle_time > 1000) 
     {
-        target_angle = (ABSOLUTE_MAX_ANGLE - SAFETY_MARGIN);
+        target_state = !target_state; // 状态反转 (0->1, 1->0)
+        last_toggle_time = now;       // 更新时间戳
     }
 
-    // 1. 初始化：如果是第一次进入这个模式，把轨迹起点设为电机当前真实位置
-    if (hit_traj_init == 0)
-    {
-        hit_traj_pos = Rise->fdb.Hit_pitch_angle;
-        hit_traj_vel = Rise->fdb.Hit_pitch_speed;
-        hit_traj_init = 1;
-    }
+    // 3. 根据状态设定目标角度
+    float target_angle = (target_state == 0) ? 90.0f : 0.0f;
 
-
-    // 3. 串级 PID 控制 (关键：引入前馈)
-    // 3.1 位置环
-    PID_SetPIDRef(&Rise->pid.Hit_Ang_PID, hit_traj_pos);
-    PID_SetPIDFdb(&Rise->pid.Hit_Ang_PID, Rise->fdb.Hit_pitch_angle);
-    PID_CalcPID(&Rise->pid.Hit_Ang_PID, &Rise->pid.Hit_Ang_Middle_PIDParam);
-
-    // 3.2 速度环 (目标 = 位置环输出 + 轨迹规划的速度前馈)
-    // 加上 hit_traj_vel 非常重要！这意味着PID不需要等有了误差才加速，
-    // 而是直接要把电机速度拉到规划速度。
-    float pid_out = PID_GetPIDOutput(&Rise->pid.Hit_Ang_PID);
-    float spd_ref;
-    float angle = Rise->fdb.Hit_pitch_angle;
-    float speed = Rise->fdb.Hit_pitch_speed;
-    // 到达击打目标之前：允许前馈
-    if (speed<= hit_target_speed && angle < target_angle)
-    {
-        spd_ref = pid_out + hit_target_speed;
-    }
-    else
-    {
-        spd_ref = hit_target_speed;
-    }
-    angle = Rise->fdb.Hit_pitch_angle;
-    speed = Rise->fdb.Hit_pitch_speed;
-
-    const float SOFT_BRAKE_ANGLE = ABSOLUTE_MAX_ANGLE - 40.0f ; // 开始减速的角度
-    const float HARD_BRAKE_ANGLE = ABSOLUTE_MAX_ANGLE - 30.0f; // 强制倒车的角度（必须比 Soft 大！）
-
-// 优先级 1：超过绝对硬限位（救命用的）
-    if (angle > HARD_BRAKE_ANGLE)
-    {
-        // 强制反向压回去，力度可以用 PID 计算或者给个固定值
-        // 建议不要直接给 -MAX，而是给一个较大的反向值，或者基于超出量的 P 控制
-        spd_ref = -70.0f; 
-    }
-    // 优先级 2：进入软限位区间（柔和减速）
-    else if (angle > SOFT_BRAKE_ANGLE)
-    {
-        // 计算减速比例 (0.0 ~ 1.0)
-        float range = HARD_BRAKE_ANGLE - SOFT_BRAKE_ANGLE;
-        float curr = angle - SOFT_BRAKE_ANGLE;
-        float scale = 1.0f - (curr / range); 
-        
-        if (scale < 0.0f) scale = 0.0f;
-
-        // 只限制正向速度，允许反向速度（允许它退回来）
-        if (spd_ref > 0.0f)
-        {
-            spd_ref *= scale; // 越靠近硬限位，正向目标速度越接近 0
-        }
-        
-        // 进阶：如果你希望它在减速区不仅是不加速，而是主动刹车
-        // 可以在这里判断当前物理速度，如果物理速度过快，强制给负指令
-
-        if (speed > 10.0f) { // 如果惯性依然很大
-             spd_ref = -30.0f; // 给一点点反向力刹车
-        }
-
-    }
-
-    speed = Rise->fdb.Hit_pitch_speed;
-    angle = Rise->fdb.Hit_pitch_angle;
-    // 5. 后处理：如果到达了
-    if (speed <=2.0f && angle >= target_angle)
-    {
-        // 可以在这里切换状态机，进入“随挥”或“复位”阶段
-        // 下次进来前记得把 hit_traj_init 置 0
-        g_hit_finished_flag = 1;
-    }
-
-    return spd_ref;
+    // 4. 【关键】每一帧都必须调用 PID 计算函数！
+    // 只有不停地调用它，电机才能持续获得正确的力矩去接近目标
+    Rise_Set_OutputState(Rise_middle);
+    Rise_Set_Angle_Output(target_angle, 0.0f, 0.0f, 0.0f, 0.0f);
 }
-
 
 void Rise_Chop_Cal()
 {
@@ -972,7 +980,6 @@ uint32_t g_case0_entry_count = 0;
 static uint8_t g_auto_state = 0; // 初始状态 0: 空闲/启动
 float g_auto_start_time = 0.0f;
 float g_auto_start_height = 0.0f;
-float g_auto_start_hit_angle = 0.0f;
 static uint8_t g_last_auto_mode = Rise_Stop; // 假设默认为 Stop
 float return_ramp_angle = 0.0f;
 float burst_ff = 0.0f;
@@ -987,18 +994,17 @@ void Rise_Auto_Cal()
     {
 
     case 0: // 启动
-        Rise_Reset_Hit_Traj();
+        // Rise_Reset_Hit_Traj();
         g_hit_finished_flag = 0;
         g_case0_entry_count++;
         g_auto_start_time = current_time;
         g_auto_state = 1;
         g_auto_start_height = Rise->fdb.Lift_pitch_angle;
-        g_auto_start_hit_angle = Rise->fdb.Hit_pitch_angle;
         break;
 
     case 1: // 预旋转 (Pre-spin)
         // Hit: 保持0度 | Chop: 转 | Lift: 0
-        Rise_Set_Hybrid_Output(g_auto_start_hit_angle, Rise_Chop_Front_Target_Speed, Rise_Chop_Right_Target_Speed, Rise_Chop_Left_Target_Speed, 0.0f);
+        Rise_Set_Hybrid_Output(Rise_Hit_Return_Angle, Rise_Chop_Front_Target_Speed, Rise_Chop_Right_Target_Speed, Rise_Chop_Left_Target_Speed, 0.0f);
 
         if (current_time - g_auto_start_time >= pre_spin_time)
         {
@@ -1035,7 +1041,7 @@ void Rise_Auto_Cal()
             }
 
             // 3. 发送指令
-            Rise_Set_Hybrid_Output(g_auto_start_hit_angle, Rise_Chop_Front_Target_Speed, Rise_Chop_Right_Target_Speed, Rise_Chop_Left_Target_Speed, cmd_speed);
+            Rise_Set_Hybrid_Output(Rise_Hit_Return_Angle, Rise_Chop_Front_Target_Speed, Rise_Chop_Right_Target_Speed, Rise_Chop_Left_Target_Speed, cmd_speed);
 
             // 4. 退出条件：到达目标高度 (误差小于 10 度)
             // 原来的超时判断 (lift_time) 可以保留作为“保底超时”，防止卡住
@@ -1096,13 +1102,13 @@ void Rise_Auto_Cal()
 
         // 3. 发送指令
         // 注意：这里不需要再用 LimitMaxMin 了，因为我们已经手动控制了速度
-        Rise_Set_Hybrid_Output(g_auto_start_hit_angle, Rise_Chop_Front_Target_Speed, Rise_Chop_Right_Target_Speed, Rise_Chop_Left_Target_Speed, return_speed);
+        Rise_Set_Hybrid_Output(Rise_Hit_Return_Angle, Rise_Chop_Front_Target_Speed, Rise_Chop_Right_Target_Speed, Rise_Chop_Left_Target_Speed, return_speed);
 
         // 4. 状态转换
         if (current_time - g_auto_start_time >= drop_time)
         {
             g_auto_start_time = current_time;
-            Rise_Reset_Hit_Traj();
+            // Rise_Reset_Hit_Traj();
             g_hit_finished_flag = 0; // 确保标志位干净
             g_auto_state = 4;
         }
@@ -1121,12 +1127,13 @@ void Rise_Auto_Cal()
         // ==========================================
         float current_pos = Rise->fdb.Hit_pitch_angle;
         
-        // --- A. 目标设定 (取代了旧函数的轨迹规划) ---
-        // 随挥技巧：目标设在击球点之后 30~60 度，骗电机全力冲刺
+
         float pid_target = Rise_Hit_Target_Angle + 100.0f; 
 
+        
+
         // --- B. 移植过来的【安全刹车逻辑】(重要！) ---
-        const float HARD_LIMIT = 180.0f - 10.0f; // 绝对物理限位前一点点
+        const float HARD_LIMIT = 270.0f - 10.0f; // 绝对物理限位前一点点
         
         // 如果随挥目标太远，已经撞墙了，必须截断！
         if (pid_target > HARD_LIMIT) {
@@ -1149,7 +1156,7 @@ void Rise_Auto_Cal()
             // 优势：中间有一段平顶，容许击球点有偏差也能吃满力矩
             
             float scale = 0.0f;
-            float ramp_width = 10.0f; // 爬升区宽度 (度)
+            float ramp_width = 12.0f; // 爬升区宽度 (度)
             
             // 计算平顶区的边缘
             float plateau_edge = Rise_Hit_Zone_Width - ramp_width; 
@@ -1187,6 +1194,11 @@ void Rise_Auto_Cal()
                                   Rise_Chop_Right_Target_Speed, 
                                   Rise_Chop_Left_Target_Speed, 
                                   hold_speed);
+        // Rise_Set_Hybrid_Output(pid_target,
+        //                           Rise_Chop_Front_Target_Speed, 
+        //                           Rise_Chop_Right_Target_Speed, 
+        //                           Rise_Chop_Left_Target_Speed, 
+        //                           hold_speed);
 
         if (current_time - g_auto_start_time >= hit_action_time || g_hit_finished_flag == 1)
         {
@@ -1208,8 +1220,8 @@ void Rise_Auto_Cal()
             float hold_speed = -pos_error * LIFT_RETURN_KP;
             LimitMaxMin(hold_speed, LIFT_MAX_RETURN_SPEED, -LIFT_MAX_RETURN_SPEED);
 
-            float return_step = 0.5f;
-            if (return_ramp_angle > g_auto_start_hit_angle + return_step)
+            float return_step = 0.1f;
+            if (return_ramp_angle > Rise_Hit_Return_Angle + return_step)
             {
                 return_ramp_angle -= return_step; // 慢慢减小
                 // } else if (return_ramp_angle < Rise_Hit_Return_Angle - return_step) {
@@ -1217,7 +1229,7 @@ void Rise_Auto_Cal()
             }
             else
             {
-                return_ramp_angle = g_auto_start_hit_angle; // 到了就锁死
+                return_ramp_angle = Rise_Hit_Return_Angle; // 到了就锁死
             }
 
             // 发送：Hit 回 0 度
@@ -1226,7 +1238,7 @@ void Rise_Auto_Cal()
 
         // ！！！ 关键修改：等待复位完成 ！！！
         // 使用全局变量 Rise_Hit_Return_Time (例如 1.0秒)
-        if (fabs(Rise->fdb.Hit_pitch_angle - g_auto_start_hit_angle) < 1.0f)
+        if (fabs(Rise->fdb.Hit_pitch_angle - Rise_Hit_Return_Angle) < 1.0f)
         {
             g_auto_state = 6; // 时间到了，才进入“完成态”
         }
@@ -1258,7 +1270,6 @@ void Rise_Without_Hit_Cal()
     switch (g_auto_state)
     {
     case 0: // 启动与初始化
-        Rise_Reset_Hit_Traj();
         g_hit_finished_flag = 0;
         g_case0_entry_count++;
         g_auto_start_time = current_time;
@@ -1376,6 +1387,13 @@ static uint8_t last_ctrl_mode = Rise_Stop;
 void Rise_Control()
 {
     Rise_DataTypeDef *Rise = Rise_GetRisePtr();
+
+    if (g_system_homed == 0)
+    {
+        Rise_Homing_Loop(HIT_INIT_ANGLE);
+        return; // 强制返回，不执行后面逻辑
+    }
+
     // 1. 检测模式切换边沿
     if (Rise->ctrl_mode != last_ctrl_mode)
     {
@@ -1409,6 +1427,9 @@ void Rise_Control()
         break;
     case Rise_Without_Hit:
         Rise_Without_Hit_Cal();
+        break;
+    case Rise_Hit:
+        Rise_Hit_Cal();
         break;
     default:
         break;

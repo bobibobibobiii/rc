@@ -30,7 +30,7 @@ void Vofa_Frame_Init(void)
  * @param ch6 通道6数据 (float)
  * @param ch7 通道7数据 (float)
  */
-void Vofa_Send_Data(float ch1, float ch2, float ch3, float ch4 , float ch5, float ch6)
+void Vofa_Send_Data(float ch1, float ch2, float ch3, float ch4 )
 {
     // 1. (!!! 关键的DMA安全检查 !!!)
     // 检查上一次 DMA 传输是否已经完成
@@ -45,8 +45,8 @@ void Vofa_Send_Data(float ch1, float ch2, float ch3, float ch4 , float ch5, floa
     g_vofa_frame_buff.fdata[1] = ch2;
     g_vofa_frame_buff.fdata[2] = ch3;
     g_vofa_frame_buff.fdata[3] = ch4;
-    g_vofa_frame_buff.fdata[4] = ch5;
-    g_vofa_frame_buff.fdata[5] = ch6;
+    // g_vofa_frame_buff.fdata[4] = ch5;
+    // g_vofa_frame_buff.fdata[5] = ch6;
     
     // 帧尾在 Vofa_Frame_Init() 中已填充，此处无需重复填充
 

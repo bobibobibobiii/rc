@@ -1,4 +1,14 @@
 /*
+ * @Author: WenXin Tan 3086080053@qq.com
+ * @Date: 2025-11-11 20:47:04
+ * @LastEditors: WenXin Tan 3086080053@qq.com
+ * @LastEditTime: 2026-01-11 17:48:33
+ * @FilePath: \MDK-ARMd:\Files\xiaobing_origin\xiaobing\Core\Inc\Utility\util_vofa.h
+ * @Description: 
+ * 
+ * Copyright (c) 2026 by ${git_name_email}, All Rights Reserved. 
+ */
+/*
  * @Author: error: error: git config user.name & please set dead value or install git && error: git config user.email & please set dead value or install git & please set dead value or install git
  * @Date: 2025-11-11 20:47:04
  * @LastEditors: WenXin Tan 3086080053@qq.com
@@ -14,7 +24,7 @@
 #include "main.h" // 确保包含了 STM32 HAL 库的头文件
 
 // 1. 定义数据通道数量
-#define CH_COUNT (6)
+#define CH_COUNT (4)
 
 // 2. 定义数据帧结构体 (3个float + 4字节帧尾 = 16字节)
 typedef struct Frame {
@@ -36,6 +46,6 @@ extern Frame_t g_vofa_frame_buff;
 
 // 5. 声明初始化和发送函数
 void Vofa_Frame_Init(void);
-void Vofa_Send_Data(float ch1, float ch2, float ch3, float ch4, float ch5, float ch6);
+void Vofa_Send_Data(float ch1, float ch2, float ch3, float ch4);
 
 #endif

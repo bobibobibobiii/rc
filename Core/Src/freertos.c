@@ -120,16 +120,16 @@ void MX_FREERTOS_Init(void) {
   InitTaskHandle = osThreadCreate(osThread(InitTask), NULL);
 
   /* definition and creation of PlatformTask */
-  osThreadDef(PlatformTask, Platform_Task, osPriorityRealtime, 0, 512);
-  PlatformTaskHandle = osThreadCreate(osThread(PlatformTask), NULL);
+  // osThreadDef(PlatformTask, Platform_Task, osPriorityRealtime, 0, 512);
+  // PlatformTaskHandle = osThreadCreate(osThread(PlatformTask), NULL);
 
   /* definition and creation of CommunicateTask */
   osThreadDef(CommunicateTask, Communicate_Task, osPriorityRealtime, 0, 512);
   CommunicateTaskHandle = osThreadCreate(osThread(CommunicateTask), NULL);
 
   /* definition and creation of RemoteTask */
-  osThreadDef(RemoteTask, Remote_Task, osPriorityRealtime, 0, 256);
-  RemoteTaskHandle = osThreadCreate(osThread(RemoteTask), NULL);
+  // osThreadDef(RemoteTask, Remote_Task, osPriorityRealtime, 0, 256);
+  // RemoteTaskHandle = osThreadCreate(osThread(RemoteTask), NULL);
 
   /* definition and creation of ChassisTask */
   // osThreadDef(ChassisTask, Chassis_Task, osPriorityRealtime, 0, 256);

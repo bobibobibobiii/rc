@@ -106,17 +106,30 @@ const float Const_PitchSpdMotorParam[4][5] = {
 
 //@twx PID Parameters for Rise
 
-float Const_HitPosMotorParam[2][4][5] = {
+float Const_HitLeftPosMotorParam[4][5] = {
     //   Kp      Ki      Kd      I_Limit  Out_Limit
-    {{0.3f,  0.001f,  0.0f,   20.0f,   27.0f}, {0.1f, -1}, {0, 0}, {-1, -1}},
-	{{0.15f,  0.001f,  1.5f,   20.0f,   27.0f}, {0.1f, -1}, {0, 0}, {-1, -1}}
+  {0.55f, 0.0f, 0.0f, 0.0f, 30.0f},
+  {0.1f, -1}, {0, 0}, {-1, -1}
 };
 
 
-float Const_HitSpdMotorParam[2][4][5] = {
+float Const_HitLeftSpdMotorParam[4][5] = {
     //   Kp      Ki      Kd      I_Limit  Out_Limit
-    {{2.65f,  0.01f,  0.65f,   20.0f,   27.0f}, {0.1f, -1}, {0, 0}, {-1, -1}},
-	{{2.0f,  0.001f,  0.0f,   20.0f,   27.0f}, {0.1f, -1}, {0, 0}, {-1, -1}}  
+  {1.7f, 0.01f, 0.0f, 0.1f, 5.5f},
+  {0.1f, -1}, {0, 0}, {-1, -1}
+};
+
+float Const_HitRightPosMotorParam[4][5] = {
+    //   Kp      Ki      Kd      I_Limit  Out_Limit
+  {0.55f, 0.0f, 0.0f, 0.0f, 30.0f},
+  {0.1f, -1}, {0, 0}, {-1, -1}
+};
+
+
+float Const_HitRightSpdMotorParam[4][5] = {
+    //   Kp      Ki      Kd      I_Limit  Out_Limit
+  {1.7f, 0.01f, 0.0f, 0.1f, 5.5f},
+  {0.1f, -1}, {0, 0}, {-1, -1}
 };
 
 float Const_ChopPosMotorParam[4][5] = {
