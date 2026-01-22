@@ -1,3 +1,13 @@
+/*
+ * @Author: WenXin Tan 3086080053@qq.com
+ * @Date: 2025-11-11 20:46:24
+ * @LastEditors: WenXin Tan 3086080053@qq.com
+ * @LastEditTime: 2026-01-17 17:15:48
+ * @FilePath: \MDK-ARMd:\Files\xiaobing_origin\xiaobing\Core\Src\Utility\util_vofa.c
+ * @Description: 
+ * 
+ * Copyright (c) 2026 by ${git_name_email}, All Rights Reserved. 
+ */
 #include "util_vofa.h"
 
 // 1. 定义全局的发送缓冲区
@@ -28,9 +38,8 @@ void Vofa_Frame_Init(void)
  * @param ch4 通道4数据 (float)
  * @param ch5 通道5数据 (float)
  * @param ch6 通道6数据 (float)
- * @param ch7 通道7数据 (float)
  */
-void Vofa_Send_Data(float ch1, float ch2, float ch3, float ch4 )
+void Vofa_Send_Data(float ch1, float ch2, float ch3, float ch4 , float ch5, float ch6)
 {
     // 1. (!!! 关键的DMA安全检查 !!!)
     // 检查上一次 DMA 传输是否已经完成
@@ -45,8 +54,8 @@ void Vofa_Send_Data(float ch1, float ch2, float ch3, float ch4 )
     g_vofa_frame_buff.fdata[1] = ch2;
     g_vofa_frame_buff.fdata[2] = ch3;
     g_vofa_frame_buff.fdata[3] = ch4;
-    // g_vofa_frame_buff.fdata[4] = ch5;
-    // g_vofa_frame_buff.fdata[5] = ch6;
+    g_vofa_frame_buff.fdata[4] = ch5;
+    g_vofa_frame_buff.fdata[5] = ch6;
     
     // 帧尾在 Vofa_Frame_Init() 中已填充，此处无需重复填充
 

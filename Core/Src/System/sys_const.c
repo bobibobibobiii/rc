@@ -108,27 +108,27 @@ const float Const_PitchSpdMotorParam[4][5] = {
 
 float Const_HitLeftPosMotorParam[4][5] = {
     //   Kp      Ki      Kd      I_Limit  Out_Limit
-  {0.55f, 0.0f, 0.0f, 0.0f, 30.0f},
+  {0.4f, 0.0f, 0.0f, 0.0f, 30.0f},
   {0.1f, -1}, {0, 0}, {-1, -1}
 };
 
 
 float Const_HitLeftSpdMotorParam[4][5] = {
     //   Kp      Ki      Kd      I_Limit  Out_Limit
-  {1.7f, 0.01f, 0.0f, 0.1f, 5.5f},
+  {0.7f, 0.01f, 0.0f, 0.1f, 5.5f},
   {0.1f, -1}, {0, 0}, {-1, -1}
 };
 
 float Const_HitRightPosMotorParam[4][5] = {
     //   Kp      Ki      Kd      I_Limit  Out_Limit
-  {0.55f, 0.0f, 0.0f, 0.0f, 30.0f},
+  {0.4f, 0.0f, 0.0f, 0.0f, 30.0f},
   {0.1f, -1}, {0, 0}, {-1, -1}
 };
 
 
 float Const_HitRightSpdMotorParam[4][5] = {
     //   Kp      Ki      Kd      I_Limit  Out_Limit
-  {1.7f, 0.01f, 0.0f, 0.1f, 5.5f},
+  {0.7f, 0.01f, 0.0f, 0.1f, 5.5f},
   {0.1f, -1}, {0, 0}, {-1, -1}
 };
 
@@ -158,7 +158,7 @@ float Const_LiftPosMotorParam[4][5] = {
 };
 
 float Const_LiftSpdMotorParam[4][5] = {
-	{0.5f, 0.0f, 0.0f, 2.0f, 10.0f},
+	{0.5f, 0.02f, 0.0f, 10.0f, 10.0f},
 	{0.1f, -1}, {0, 0}, {-1, -1}	
 };
 

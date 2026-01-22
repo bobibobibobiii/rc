@@ -2,8 +2,8 @@
  * @Author: error: error: git config user.name & please set dead value or install git && error: git config user.email & please set dead value or install git & please set dead value or install git
  * @Date: 2025-10-31 18:52:29
  * @LastEditors: WenXin Tan 3086080053@qq.com
- * @LastEditTime: 2026-01-16 17:43:17
- * @FilePath: \MDK-ARMd:\Files\xiaobing_origin\xiaobing\Core\Src\Application\app_rise.c
+ * @LastEditTime: 2026-01-22 03:18:53
+ * @FilePath: \xiaobing\Core\Src\Application\app_rise.c
  * @Description: 
  * 
  * Copyright (c) 2025 by ${git_name_email}, All Rights Reserved. 
@@ -62,24 +62,27 @@ extern float burst_ff;
         // ==========================================
 
         Vofa_Send_Data(
-        Motor_Rise_Hit_Motor.encoder.speed,
-        // Motor_Rise_Chop_Left_Motor.encoder.speed,
-        // Motor_Rise_Chop_Right_Motor.encoder.speed,
-        burst_ff,
-        Motor_Rise_Hit_Motor.encoder.consequent_angle-265.0f,
-        Motor_Rise_Hit_Motor.encoder.torque 
+        Motor_Rise_Hit_LeftMotor.encoder.standard_speed,
+        Motor_Rise_Hit_LeftMotor.encoder.consequent_angle,
+        Motor_Rise_Hit_LeftMotor.encoder.torque,
+        // Motor_Rise_Hit_RightMotor.encoder.standard_speed,
+        // Motor_Rise_Hit_RightMotor.encoder.consequent_angle,
+        // Motor_Rise_Hit_RightMotor.encoder.torque 
+        Motor_Rise_Chop_Left_Motor.encoder.speed,
+        Motor_Rise_Chop_Right_Motor.encoder.speed,
+        Motor_Rise_Chop_Front_Motor.encoder.speed
         );
 
         Rise_Update_Fdb();
 
-        Rise_Check();
-        if(Rise->error_code == 0){
-            Rise_Control();	 
-          }
-        else{
-            Rise_Set_Torque_Output(0,0,0,0,0);
-          }
-		  // Rise_Control();	
+        // Rise_Check();
+        // if(Rise->error_code == 0){
+        //     Rise_Control();	 
+        //   }
+        // else{
+        //     Rise_Set_Torque_Output(0,0,0,0,0,0);
+        //   }
+		  Rise_Control();	
 		
 		  Rise_Output();
 

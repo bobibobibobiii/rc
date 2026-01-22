@@ -157,9 +157,9 @@ void Motor_InitAllMotors() {
     // Motor_Gimbal_Motors.motor_handle[3] = NULL;
 
     Motor_groupHandle[7] = &Motor_Rise_Hit_Motors;
-    Motor_InitMotorGroup(&Motor_Rise_Hit_Motors, Motor_TYPE_Dji3508_xroll, 2, &hcan1, NULL, 0x200);
-    Motor_InitMotor(&Motor_Rise_Hit_LeftMotor, Motor_TYPE_Dji3508_xroll, 0x201, 0.1, Dji3508_xroll_encoder_callback,0);
-    Motor_InitMotor(&Motor_Rise_Hit_RightMotor, Motor_TYPE_Dji3508_xroll, 0x202, 0.1, Dji3508_xroll_encoder_callback,0);
+    Motor_InitMotorGroup(&Motor_Rise_Hit_Motors, Motor_TYPE_Dji3508_origin, 2, &hcan2, NULL, 0x200);
+    Motor_InitMotor(&Motor_Rise_Hit_LeftMotor, Motor_TYPE_Dji3508_origin, 0x201, 0.1, Dji3508_origin_encoder_callback,0);
+    Motor_InitMotor(&Motor_Rise_Hit_RightMotor, Motor_TYPE_Dji3508_origin, 0x202, 0.1,Dji3508_origin_encoder_callback,0);
     Motor_Rise_Hit_Motors.motor_handle[0] = &Motor_Rise_Hit_LeftMotor;
     Motor_Rise_Hit_Motors.motor_handle[1] = &Motor_Rise_Hit_RightMotor;
     Motor_Rise_Hit_Motors.motor_handle[2] = NULL;
@@ -779,7 +779,7 @@ uint16_t crc_ccitt(uint16_t crc, uint8_t const *buffer, uint32_t len)
 		crc = crc_ccitt_byte(crc, *buffer++);
 	return crc;
 }
-
+//新击球用
 void Dji3508_origin_encoder_callback(Motor_MotorTypeDef* motor, uint8_t* rxdata, uint32_t len)
 {
 	if(motor == NULL) return;
@@ -835,11 +835,11 @@ void Dji3508_origin_encoder_callback(Motor_MotorTypeDef* motor, uint8_t* rxdata,
 
 	motor->type = Motor_TYPE_Dji3508_origin;
 	motor->update_dt = DWT_GetDeltaT(&motor->last_update_tick);
-    motor->watchdog = 0;
+  motor->watchdog = 0;
 
 
 }
-//新击球用
+
 void Dji3508_xroll_encoder_callback(Motor_MotorTypeDef* motor, uint8_t* rxdata, uint32_t len)
 {
 	if(motor == NULL) return;
@@ -973,69 +973,4 @@ void P1010B_Init_Feedback(Motor_MotorGroupTypeDef *pgroup, uint8_t motor_id)
     
     // 6. 稍微延时，给电机反应时间
     HAL_Delay(10);
-}
-
-extern uint8_t g_system_homed;
-void P1010B_encoder_callback(Motor_MotorTypeDef* motor, uint8_t* rxdata, uint32_t len){
-    if (motor == NULL) return;
-    if (len != 8) return;
-
-    // --- 1. 速度解析 (Bytes 0-1) ---
-    int16_t raw_speed = (int16_t)((rxdata[0] << 8) | rxdata[1]);
-    // 假设 raw 100 = 10rpm，具体系数按手册
-    motor->encoder.speed = (float)raw_speed / 10.0f / 60.0f * 2.0f * 3.14159f; 
-
-    // --- 2. 电流解析 (Bytes 2-3) ---
-    int16_t raw_current = (int16_t)((rxdata[2] << 8) | rxdata[3]);
-    motor->encoder.current = (float)raw_current / 100.0f; 
-    motor->encoder.torque = motor->encoder.current * 2.1f;
-
-    // --- 3. 绝对位置解析 (Bytes 6-7, Code 13) ---
-    // 这是物理上的真实角度，永远在 0~360 之间
-    uint16_t raw_abs_pos = (uint16_t)((rxdata[6] << 8) | rxdata[7]);
-    
-    // 【注意】满量程通常是 65535，如果是 P1010B 以前的版本可能是 32768
-    float abs_angle = (float)raw_abs_pos / 32768.0f * 360.0f; 
-    
-    motor->encoder.absolute_angle = abs_angle;
-
-    // --- 4. 核心逻辑：统一使用绝对角度作为计算基准 ---
-    // 我们不再看 Bytes 4-5 (raw_pos)，直接用 absolute_angle 驱动多圈逻辑
-    // 这样能保证单圈角度和多圈角度的数据源是同一个，不会打架
-    motor->encoder.angle = abs_angle; 
-
-    if (g_system_homed == 0)
-        {
-            motor->encoder.angle = abs_angle;
-            motor->encoder.last_angle = abs_angle; // 实时更新 last，防止切换瞬间跳变
-            motor->encoder.round_count = 0;        // 圈数强制清零
-            
-            // 关键：在回零阶段，连续角度 = 绝对角度 (0~360)
-            motor->encoder.consequent_angle = abs_angle; 
-        }
-        // 场景 B：系统已回零 (开始正常工作)
-        // 此时开启多圈累加功能
-        else 
-        {
-            motor->encoder.angle = abs_angle;
-            
-            // 计算差值
-            float angle_diff = motor->encoder.angle - motor->encoder.last_angle;
-            
-            // 更新 last
-            motor->encoder.last_angle = motor->encoder.angle; 
-
-            // 只有在这里才允许更新 round_count
-            if (angle_diff < -150.0f) {
-                motor->encoder.round_count++; 
-            } else if (angle_diff > 150.0f) {
-                motor->encoder.round_count--; 
-            }
-
-            // === 计算连续总角度 (PID 的输入) ===
-            // 核心公式：总角度 = 圈数 * 360 + 当前单圈角度
-            // 举例：第1圈，angle=10 -> total = 360 + 10 = 370度
-            motor->encoder.consequent_angle = (motor->encoder.round_count * 360.0f) + motor->encoder.angle;
-        }
-    motor->watchdog = 0;
 }

@@ -24,7 +24,7 @@
 #include "main.h" // 确保包含了 STM32 HAL 库的头文件
 
 // 1. 定义数据通道数量
-#define CH_COUNT (4)
+#define CH_COUNT (6)
 
 // 2. 定义数据帧结构体 (3个float + 4字节帧尾 = 16字节)
 typedef struct Frame {
@@ -46,6 +46,6 @@ extern Frame_t g_vofa_frame_buff;
 
 // 5. 声明初始化和发送函数
 void Vofa_Frame_Init(void);
-void Vofa_Send_Data(float ch1, float ch2, float ch3, float ch4);
+void Vofa_Send_Data(float ch1, float ch2, float ch3, float ch4 , float ch5 , float ch6 );
 
 #endif

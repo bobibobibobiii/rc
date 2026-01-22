@@ -1,143 +1,162 @@
 /*  Project      : Polaris
- * 
+ *
  *  file         : module_rise.h
  *  Description  : This file contains rise control function
  *  LastEditors  : twx
  *  Date         : 2025-10-31
- *  LastEditTime : 
+ *  LastEditTime :
  */
 
 #ifndef MODULE_RISE_H
 #define MODULE_RISE_H
 
-
 #ifdef __cplusplus
-extern "C" {
-#endif 
+extern "C"
+{
+#endif
 
 #include "periph_motor.h"
 #include "alg_pid.h"
 
-typedef enum
-{
-	Rise_slow = 1,
-	Rise_fast,
-	Rise_middle,
-	Rise_stop,
-}Rise_Output_StateEnum;
+  typedef enum
+  {
+    Rise_slow = 1,
+    Rise_fast,
+    Rise_middle,
+    Rise_stop,
+  } Rise_Output_StateEnum;
 
-typedef enum
-{
-  Rise_Auto=1,
-  Rise_Cuoqiu,
-  Rise_Taisheng,
-  Rise_Stop,
-  Rise_Without_Hit,
-  Rise_Hit,
+  typedef enum
+  {
+    Rise_Auto = 1,
+    Rise_Cuoqiu,
+    Rise_Taisheng,
+    Rise_Stop,
+    Rise_Without_Hit,
+    Rise_Hit,
 
-}Rise_Ctrl_ModeEnum;
+  } Rise_Ctrl_ModeEnum;
 
-typedef struct
-{
-  float Hit_left_angle,Hit_right_angle,Hit_left_speed,Hit_right_speed;
-  float Chop_front_pitch_angle,Chop_front_pitch_speed ;
-  float Chop_right_pitch_angle,Chop_right_pitch_speed;
-  float Chop_left_pitch_angle,Chop_left_pitch_speed;
-  float Lift_pitch_angle, Lift_pitch_speed,Lift_pitch_torque;
+  typedef struct
+  {
+    float Hit_left_angle, Hit_right_angle, Hit_left_speed, Hit_right_speed;
+    float Chop_front_pitch_angle, Chop_front_pitch_speed;
+    float Chop_right_pitch_angle, Chop_right_pitch_speed;
+    float Chop_left_pitch_angle, Chop_left_pitch_speed;
+    float Lift_pitch_angle, Lift_pitch_speed, Lift_pitch_torque;
 
+  } Rise_FeedbackTypeDef;
 
-}Rise_FeedbackTypeDef;
+  typedef struct
+  {
+    float Hit_left_torque;
+    float Hit_right_torque;
+    float Chop_front_pitch_torque;
+    float Chop_right_pitch_torque;
+    float Chop_left_pitch_torque;
+    float Hit_yaw_torque;
+    float Chop_front_yaw_torque;
+    float Chop_right_yaw_torque;
+    float Chop_left_yaw_torque;
+    float Hit_pitch_angle;
+    float Chop_front_pitch_angle;
+    float Chop_right_pitch_angle;
+    float Chop_left_pitch_angle;
 
-typedef struct
-{
-  float Hit_left_torque;
-  float Hit_right_torque;
-  float Chop_front_pitch_torque;
-  float Chop_right_pitch_torque; 
-  float Chop_left_pitch_torque;
-  float Hit_yaw_torque;
-  float Chop_front_yaw_torque;
-  float Chop_right_yaw_torque;
-  float Chop_left_yaw_torque;
-  float Hit_pitch_angle;
-  float Chop_front_pitch_angle;
-  float Chop_right_pitch_angle; 
-  float Chop_left_pitch_angle ;
+  } Rise_TargetTypeDef;
 
-}Rise_TargetTypeDef;
+  typedef struct
+  {
+    PID_PIDTypeDef Hit_Left_Ang_PID;
+    PID_PIDTypeDef Hit_Right_Ang_PID;
+    PID_PIDTypeDef Chop_Front_Ang_PID;
+    PID_PIDTypeDef Chop_Right_Ang_PID;
+    PID_PIDTypeDef Chop_Left_Ang_PID;
+    PID_PIDTypeDef Lift_Ang_PID;
 
-typedef struct
-{
-  PID_PIDTypeDef Hit_Ang_PID;
-  PID_PIDTypeDef Chop_Front_Ang_PID;
-  PID_PIDTypeDef Chop_Right_Ang_PID;
-  PID_PIDTypeDef Chop_Left_Ang_PID;
-  PID_PIDTypeDef Lift_Ang_PID;
+    PID_PIDParamTypeDef Hit_Left_Ang_PIDParam;
+    PID_PIDParamTypeDef Hit_Right_Ang_PIDParam;
 
-  PID_PIDParamTypeDef Hit_Left_Ang_PIDParam;
-  PID_PIDParamTypeDef Hit_Right_Ang_PIDParam;
+    PID_PIDParamTypeDef Chop_Front_Ang_Middle_PIDParam;
 
-  PID_PIDParamTypeDef Chop_Front_Ang_Middle_PIDParam;
+    PID_PIDParamTypeDef Chop_Right_Ang_Middle_PIDParam;
 
-  PID_PIDParamTypeDef Chop_Right_Ang_Middle_PIDParam;
+    PID_PIDParamTypeDef Chop_Left_Ang_Middle_PIDParam;
 
-  PID_PIDParamTypeDef Chop_Left_Ang_Middle_PIDParam;
+    PID_PIDParamTypeDef Lift_Ang_Middle_PIDParam;
 
-  PID_PIDParamTypeDef Lift_Ang_Middle_PIDParam;
+    PID_PIDTypeDef Hit_Left_Spd_PID;
+    PID_PIDTypeDef Hit_Right_Spd_PID;
+    PID_PIDTypeDef Chop_Front_Spd_PID;
+    PID_PIDTypeDef Chop_Right_Spd_PID;
+    PID_PIDTypeDef Chop_Left_Spd_PID;
+    PID_PIDTypeDef Lift_Spd_PID;
 
-  PID_PIDTypeDef Hit_Spd_PID;
-  PID_PIDTypeDef Chop_Front_Spd_PID;
-  PID_PIDTypeDef Chop_Right_Spd_PID;
-  PID_PIDTypeDef Chop_Left_Spd_PID;
-  PID_PIDTypeDef Lift_Spd_PID;
+    PID_PIDParamTypeDef Hit_Left_Spd_PIDParam;
+    PID_PIDParamTypeDef Hit_Right_Spd_PIDParam;
 
-  PID_PIDParamTypeDef Hit_Left_Spd_PIDParam;
-  PID_PIDParamTypeDef Hit_Right_Spd_PIDParam;
+    PID_PIDParamTypeDef Chop_Front_Spd_Middle_PIDParam;
 
-  PID_PIDParamTypeDef Chop_Front_Spd_Middle_PIDParam;
+    PID_PIDParamTypeDef Chop_Right_Spd_Middle_PIDParam;
 
-  PID_PIDParamTypeDef Chop_Right_Spd_Middle_PIDParam;
+    PID_PIDParamTypeDef Chop_Left_Spd_Middle_PIDParam;
+    ;
 
-  PID_PIDParamTypeDef Chop_Left_Spd_Middle_PIDParam;;
+    PID_PIDParamTypeDef Lift_Spd_Middle_PIDParam;
 
-  PID_PIDParamTypeDef Lift_Spd_Middle_PIDParam;
+  } Rise_PIDTypeDef;
 
-	
-}Rise_PIDTypeDef;
+  typedef struct
+  {
+    Rise_Output_StateEnum output_state;
+    Rise_Ctrl_ModeEnum ctrl_mode;
+    Rise_FeedbackTypeDef fdb;
+    Rise_TargetTypeDef tar;
+    Rise_PIDTypeDef pid;
 
-typedef struct {
-Rise_Output_StateEnum  output_state;
-Rise_Ctrl_ModeEnum ctrl_mode;
-Rise_FeedbackTypeDef fdb;
-Rise_TargetTypeDef tar;
-Rise_PIDTypeDef pid;
+    float update_dt;
+    uint32_t last_update_tick;
+    uint8_t error_code;
 
-float update_dt;
-uint32_t last_update_tick;
-uint8_t error_code;
+    float lift_zero_offset; // 新增：用于记录上电时的初始角度
 
-float lift_zero_offset; // 新增：用于记录上电时的初始角度
+  } Rise_DataTypeDef;
 
-} Rise_DataTypeDef;
+  typedef struct
+  {
+    float Rise_Hit_Ready_Speed ;
+    float Rise_Hit_Ready_Angle ;
+    float Rise_Hit_Burst_Speed ; 
+    float Hit_Test_Speed ; 
 
-extern Rise_DataTypeDef Rise_Data;
-Rise_DataTypeDef* Rise_GetRisePtr(void);
-void Rise_Init();
-void Rise_Update_Fdb();
-void Rise_Check();
-void Rise_Set_OutputState(uint8_t state);
-void Rise_Set_Torque_Output(float torque1,float torque2,float torque3,float torque4, float torque5 );
-void Rise_Set_Angle_Output(float ang1,float ang2,float ang3,float ang4,float ang5) ;   
-void Rise_Set_Speed_Output(float speed1,float speed2,float speed3,float speed4,float speed5);    
-void Rise_Set_Hybrid_Output(float hit_angle, float chop_front_speed, float chop_right_speed, float chop_left_speed, float lift_speed) ;   
-void Rise_Set_Hybrid_FF_Output(float target_angle,float extra_torque_ff ,float max_speed_limit,float chop_front_speed, float chop_right_speed, float chop_left_speed, float lift_speed) ;                                     
-void Rise_Set_ControlMode(uint8_t mode) ;
-void Rise_Control(void);
-void Rise_Output(void);
-void Rise_Chop_Cal();
-// float Rise_Hit_Control_Variable(float start_angle, float target_angle, float hit_velocity) ;
-void Rise_Lift_Cal();
-void Rise_Without_Hit_Cal();
+    // --- 搓球电机 (Chop) 参数 ---
+    float Rise_Chop_Front_Target_Speed ;
+    float Rise_Chop_Right_Target_Speed ;
+    float Rise_Chop_Left_Target_Speed ;
+
+    // --- 时间参数 ---
+    float pre_spin_time ;   // 预旋转时间
+    float lift_time ;       // 抬升时间
+    float drop_time ;       // 下落时间
+    float hit_action_time ; // 击打动作时间
+} Rise_Params;
+
+  extern Rise_DataTypeDef Rise_Data;
+  Rise_DataTypeDef *Rise_GetRisePtr(void);
+  void Rise_Init();
+  void Rise_Update_Fdb();
+  void Rise_Check();
+  void Rise_Set_OutputState(uint8_t state);
+  void Rise_Set_Torque_Output(float torque0, float torque1, float torque2, float torque3, float torque4, float torque5);
+  void Rise_Set_Hybrid_Output(uint8_t Set_Pos_Stop, float hit_speed, float hit_angle, float chop_front_speed, float chop_right_speed, float chop_left_speed, float lift_speed);
+  void Rise_Set_ControlMode(uint8_t mode);
+  void Rise_Control(void);
+  void Rise_Output(void);
+  void Rise_Chop_Cal();
+  void Rise_Lift_Cal();
+  void Rise_Without_Hit_Cal();
+  uint8_t Rise_Hit_Finished();
+  void Rise_Hit_Cal();
 #endif
 
 #ifdef __cplusplus
