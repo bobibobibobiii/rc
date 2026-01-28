@@ -2,7 +2,7 @@
  * @Author: error: error: git config user.name & please set dead value or install git && error: git config user.email & please set dead value or install git & please set dead value or install git
  * @Date: 2025-10-31 18:52:29
  * @LastEditors: WenXin Tan 3086080053@qq.com
- * @LastEditTime: 2026-01-22 03:18:53
+ * @LastEditTime: 2026-01-24 22:43:25
  * @FilePath: \xiaobing\Core\Src\Application\app_rise.c
  * @Description: 
  * 
@@ -75,14 +75,14 @@ extern float burst_ff;
 
         Rise_Update_Fdb();
 
-        // Rise_Check();
-        // if(Rise->error_code == 0){
-        //     Rise_Control();	 
-        //   }
-        // else{
-        //     Rise_Set_Torque_Output(0,0,0,0,0,0);
-        //   }
-		  Rise_Control();	
+        Rise_Check();
+        if(Rise->error_code == 0){
+            Rise_Control();	 
+          }
+        else{
+            Rise_Set_Torque_Output(0,0,0,0,0,0);
+          }
+		  // Rise_Control();	
 		
 		  Rise_Output();
 

@@ -190,6 +190,11 @@
           <WinNumber>1</WinNumber>
           <ItemText>Rise_Hit_Burst_Speed</ItemText>
         </Ww>
+        <Ww>
+          <count>6</count>
+          <WinNumber>1</WinNumber>
+          <ItemText>Motor_Rise_Chop_Right_Motor.encoder.angle</ItemText>
+        </Ww>
       </WatchWindow1>
       <WatchWindow2>
         <Ww>

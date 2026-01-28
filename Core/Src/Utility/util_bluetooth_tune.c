@@ -27,8 +27,7 @@ extern float Rise_Chop_Left_Target_Speed;
 // --- 抬升电机 (Lift) ---
 extern float Rise_Lift_Target_Speed;
 extern float Rise_Lift_Target_Dist;
-extern float Rise_Lift_Kp_Up;
-extern float LIFT_RETURN_KP;
+extern float Rise_Lift_Kp;
 extern float LIFT_MAX_RETURN_SPEED;
 
 // --- 自动流程时间 & 阈值参数 ---
@@ -151,14 +150,8 @@ void Bluetooth_Parse_Command(char *cmd_str)
     // LKP=0.05# -> 抬升到位缓冲 KP
     else if (sscanf(cmd_str, "LKP=%f", &val_f) == 1)
     {
-        Rise_Lift_Kp_Up = val_f;
+        Rise_Lift_Kp = val_f;
         BT_Log("Lift Up KP: %.3f\r\n", val_f);
-    }
-    // LK_Ret=0.02# -> 抬升归位保持 KP
-    else if (sscanf(cmd_str, "LK_Ret=%f", &val_f) == 1)
-    {
-        LIFT_RETURN_KP = val_f;
-        BT_Log("Lift Return KP: %.3f\r\n", val_f);
     }
     // LS_MaxRet=10.0# -> 最大归位速度限制
     else if (sscanf(cmd_str, "LS_MaxRet=%f", &val_f) == 1)

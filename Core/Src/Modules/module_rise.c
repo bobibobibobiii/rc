@@ -2,7 +2,7 @@
  * @Author: error: error: git config user.name & please set dead value or install git && error: git config user.email & please set dead value or install git & please set dead value or install git
  * @Date: 2025-10-31 18:53:16
  * @LastEditors: WenXin Tan 3086080053@qq.com
- * @LastEditTime: 2026-01-22 23:38:40
+ * @LastEditTime: 2026-01-24 22:52:39
  * @FilePath: \xiaobing\Core\Src\Modules\module_rise.c
  * @Description:
  *
